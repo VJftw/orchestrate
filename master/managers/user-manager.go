@@ -7,12 +7,12 @@ import (
 
 // UserManager - Manages the lifecycle of User models
 type UserManager struct {
-	ORM persisters.GORMPersister `inject:""`
+	ORM persisters.Persister `inject:"persister gorm"`
 }
 
 // Save - Persist a new or existing User model. May be stored on multiple storage backends (PGSQL, Redis, etc.)
 func (uM *UserManager) Save(user *models.User) {
-	uM.ORM.DB.Save(user)
+	uM.ORM.Save(user)
 }
 
 // Validate - Validates a given User model.
