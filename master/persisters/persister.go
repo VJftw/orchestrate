@@ -1,6 +1,6 @@
 package persisters
 
-// Persister - Persistence functions
-type Persister interface {
+// IPersister - Persistence functions
+type IPersister interface {
 	Save(interface{})
 }

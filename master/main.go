@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/facebookgo/inject"
+	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/persisters"
 )
 
@@ -23,6 +24,7 @@ func initApp() OrchestrateApp {
 	err := g.Provide(
 		&inject.Object{Value: &app},
 		&inject.Object{Name: "persister gorm", Value: &gormDB},
+		&inject.Object{Name: "manager user", Value: &managers.UserManager{}},
 	)
 
 	if err != nil {

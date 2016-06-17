@@ -7,7 +7,7 @@ import (
 
 // UserManager - Manages the lifecycle of User models
 type UserManager struct {
-	ORM persisters.Persister `inject:"persister gorm"`
+	ORM persisters.IPersister `inject:"persister gorm"`
 }
 
 // Save - Persist a new or existing User model. May be stored on multiple storage backends (PGSQL, Redis, etc.)
