@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/vjftw/orchestrate/master/models"
 )
 
 // GORMPersister - Persistence using the GORM library
@@ -19,6 +20,8 @@ func (gP *GORMPersister) Init() {
 		fmt.Println(err)
 		panic("failed to connect database")
 	}
+
+	db.AutoMigrate(&models.User{})
 
 	gP.DB = db
 }

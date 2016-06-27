@@ -24,7 +24,7 @@ func initApp() OrchestrateApp {
 	err := g.Provide(
 		&inject.Object{Value: &app},
 		&inject.Object{Name: "persister gorm", Value: &gormDB},
-		&inject.Object{Name: "manager user", Value: &managers.UserManager{}},
+		&inject.Object{Name: "manager entity", Value: &managers.EntityManager{}},
 	)
 
 	if err != nil {

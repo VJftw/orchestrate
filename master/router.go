@@ -4,22 +4,23 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/justinas/alice"
-	"github.com/rs/cors"
-	"github.com/sebest/xff"
+	"github.com/urfave/negroni"
+	"github.com/vjftw/orchestrate/master/controllers"
 )
 
 // Router - The application router
 type Router struct {
-	Router http.Handler
+	Router         http.Handler
+	UserController controllers.UserController `inject:"inline"`
 }
 
 func (r *Router) init() {
 	router := mux.NewRouter()
 
-	corsHandler := cors.Default()
-	xffmw, _ := xff.Default()
-	chain := alice.New(corsHandler.Handler, xffmw.Handler)
+	r.UserController.AddRoutes(router)
 
-	r.Router = chain.Then(router)
+	n := negroni.Classic() // Includes some default middlewares
+	n.UseHandler(router)
+
+	r.Router = n
 }
