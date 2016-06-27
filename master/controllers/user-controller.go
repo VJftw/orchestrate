@@ -33,16 +33,21 @@ func (uC *UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user variable
-	err = uC.EntityManager.Validate(&user)
+	result, err := uC.EntityManager.Validate(&user)
 	if err != nil {
 		// 400 on Error
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		Respond(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Persist the user variable
-	uC.EntityManager.Save(&user)
+	if result {
+		// Persist the user variable
+		uC.EntityManager.Save(&user)
 
-	// write the user variable to output and set http header to 201
-	Respond(w, http.StatusCreated, user)
+		// write the user variable to output and set http header to 201
+		Respond(w, http.StatusCreated, user)
+	} else {
+		Respond(w, http.StatusBadRequest, err.Error())
+	}
+
 }

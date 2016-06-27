@@ -1,6 +1,7 @@
 package managers
 
 import (
+	"github.com/asaskevich/govalidator"
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/persisters"
 )
@@ -16,6 +17,6 @@ func (eM EntityManager) Save(entity models.IModel) {
 }
 
 // Validate - Validates a given Entity.
-func (eM EntityManager) Validate(entity models.IModel) error {
-	return nil
+func (eM EntityManager) Validate(entity models.IModel) (bool, error) {
+	return govalidator.ValidateStruct(entity)
 }

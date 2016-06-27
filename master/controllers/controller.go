@@ -1,11 +1,10 @@
 package controllers
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/unrolled/render"
 )
 
 // Controller - Interface that defines methods that all controllers should have
@@ -16,14 +15,9 @@ type Controller interface {
 // Respond - Writes the given status code and object to the response
 func Respond(w http.ResponseWriter, code int, v interface{}) {
 
-	w.Header().Set("Content-Type", "application/json")
+	r := render.New(render.Options{
+		IndentJSON: true,
+	})
 
-	j, err := json.Marshal(v)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	w.WriteHeader(code)
-	w.Write(j)
+	r.JSON(w, code, v)
 }

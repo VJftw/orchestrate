@@ -1,3 +1,4 @@
 master/master*
 master/gin-bin
+master/tmp
 *.db
