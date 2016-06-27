@@ -17,6 +17,15 @@ func (eM EntityManager) Save(entity models.IModel) {
 }
 
 // Validate - Validates a given Entity.
-func (eM EntityManager) Validate(entity models.IModel) (bool, error) {
-	return govalidator.ValidateStruct(entity)
+func (eM EntityManager) Validate(entity models.IModel) map[string]string {
+	result, err := govalidator.ValidateStruct(entity)
+
+	if result {
+		return nil
+	}
+
+	return map[string]string{
+		"errors": err.Error(),
+	}
+
 }
