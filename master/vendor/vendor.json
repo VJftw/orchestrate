@@ -1,0 +1,73 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "841BSo//Sr+IGv7vbsRTlC2ai0A=",
+			"path": "github.com/asaskevich/govalidator",
+			"revision": "df81827fdd59d8b4fb93d8910b286ab7a3919520",
+			"revisionTime": "2016-05-19T10:40:38Z"
+		},
+		{
+			"checksumSHA1": "GqkBIw2lUA6lv/jgh9WIyR0YdWY=",
+			"path": "github.com/facebookgo/inject",
+			"revision": "643b7206b487b04fbea325cf6e8d06a66f8db772",
+			"revisionTime": "2016-04-24T21:37:20Z"
+		},
+		{
+			"checksumSHA1": "i7FZ2nvv/aE37h5KD2b5hW+fHUo=",
+			"path": "github.com/facebookgo/structtag",
+			"revision": "217e25fb96916cc60332e399c9aa63f5c422ceed",
+			"revisionTime": "2015-02-14T07:43:06Z"
+		},
+		{
+			"checksumSHA1": "iIUYZyoanCQQTUaWsu8b+iOSPt4=",
+			"path": "github.com/gorilla/context",
+			"revision": "aed02d124ae4a0e94fea4541c8effd05bf0c8296",
+			"revisionTime": "2016-05-25T20:33:19Z"
+		},
+		{
+			"checksumSHA1": "H5f7qNqZl8N83s9cyC7Q1eWgAtI=",
+			"path": "github.com/gorilla/mux",
+			"revision": "9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e",
+			"revisionTime": "2016-06-05T23:35:21Z"
+		},
+		{
+			"checksumSHA1": "3gFJaZhuHsw2YbmkBsvqzw2+M2o=",
+			"path": "github.com/jinzhu/gorm",
+			"revision": "c1c4f9f86e732a042aac9f37e025893d6d6cabec",
+			"revisionTime": "2016-06-28T03:15:42Z"
+		},
+		{
+			"checksumSHA1": "4VZ1gLZHMumRjV3fclS1aX8S1aQ=",
+			"path": "github.com/jinzhu/gorm/dialects/sqlite",
+			"revision": "c1c4f9f86e732a042aac9f37e025893d6d6cabec",
+			"revisionTime": "2016-06-28T03:15:42Z"
+		},
+		{
+			"checksumSHA1": "+T2BNoq6tm0FUIvtGPhxnz56Fu0=",
+			"path": "github.com/jinzhu/inflection",
+			"revision": "8f4d3a0d04ce0b7c0cf3126fb98524246d00d102",
+			"revisionTime": "2016-06-26T22:27:13Z"
+		},
+		{
+			"checksumSHA1": "+q6a7iju2XMMu5DB/we6odv3/Iw=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "38ee283dabf11c9cbdb968eebd79b1fa7acbabe6",
+			"revisionTime": "2016-05-14T12:23:48Z"
+		},
+		{
+			"checksumSHA1": "CzcsA3k48nSAuoOkDO9PU/sp/no=",
+			"path": "github.com/unrolled/render",
+			"revision": "198ad4d8b8a4612176b804ca10555b222a086b40",
+			"revisionTime": "2016-02-18T13:01:17Z"
+		},
+		{
+			"checksumSHA1": "Z7+TshnQv2ZOg8uHnibQI0d9K04=",
+			"path": "github.com/urfave/negroni",
+			"revision": "dcaac9107a7a6ba4cf5143afc145e2b70a1c12c2",
+			"revisionTime": "2016-06-16T02:26:26Z"
+		}
+	],
+	"rootPath": "github.com/vjftw/orchestrate/master"
+}
