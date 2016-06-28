@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
+	"github.com/vjftw/orchestrate/master/models"
 )
 
 // Controller - Interface that defines methods that all controllers should have
@@ -13,11 +14,11 @@ type Controller interface {
 }
 
 // Respond - Writes the given status code and object to the response
-func Respond(w http.ResponseWriter, code int, v interface{}) {
+func Respond(w http.ResponseWriter, code int, v models.ISerializable) {
 
 	r := render.New(render.Options{
 		IndentJSON: true,
 	})
 
-	r.JSON(w, code, v)
+	r.JSON(w, code, v.ToMap())
 }

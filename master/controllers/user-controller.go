@@ -35,7 +35,7 @@ func (uC *UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	// validate the user variable
 	resultMap := uC.EntityManager.Validate(&user)
 	if resultMap != nil {
-		Respond(w, http.StatusBadRequest, resultMap)
+		// Respond(w, http.StatusBadRequest, resultMap)
 		return
 	}
 

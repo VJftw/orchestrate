@@ -10,3 +10,12 @@ type User struct {
 	FirstName    string `json:"firstName" valid:"alpha"`
 	LastName     string `json:"lastName" valid:"alpha"`
 }
+
+// ToMap - Returns a map representation of a User
+func (u User) ToMap() map[string]string {
+	return map[string]string{
+		"emailAddress": u.EmailAddress,
+		"firstName":    u.FirstName,
+		"lastName":     u.LastName,
+	}
+}
