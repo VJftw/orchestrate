@@ -33,6 +33,12 @@
 			"revisionTime": "2016-06-05T23:35:21Z"
 		},
 		{
+			"checksumSHA1": "ZxzYc1JwJ3U6kZbw/KGuPko5lSY=",
+			"path": "github.com/howeyc/fsnotify",
+			"revision": "f0c08ee9c60704c1879025f2ae0ff3e000082c13",
+			"revisionTime": "2015-10-03T19:46:02Z"
+		},
+		{
 			"checksumSHA1": "3gFJaZhuHsw2YbmkBsvqzw2+M2o=",
 			"path": "github.com/jinzhu/gorm",
 			"revision": "c1c4f9f86e732a042aac9f37e025893d6d6cabec",
@@ -51,10 +57,40 @@
 			"revisionTime": "2016-06-26T22:27:13Z"
 		},
 		{
+			"checksumSHA1": "6wAWOVRtaH7hX48hmw9o7noyy5Q=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59",
+			"revisionTime": "2016-06-02T15:08:27Z"
+		},
+		{
+			"checksumSHA1": "NkbetqlpWBi3gP08JDneC+axTKw=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"revisionTime": "2015-12-11T00:06:21Z"
+		},
+		{
 			"checksumSHA1": "+q6a7iju2XMMu5DB/we6odv3/Iw=",
 			"path": "github.com/mattn/go-sqlite3",
 			"revision": "38ee283dabf11c9cbdb968eebd79b1fa7acbabe6",
 			"revisionTime": "2016-05-14T12:23:48Z"
+		},
+		{
+			"checksumSHA1": "E6UQyurP+C3mXR9SqGPwg1lcdC0=",
+			"path": "github.com/pilu/config",
+			"revision": "3eb99e6c0b9a2dae0f56f05552c06ca5a643919b",
+			"revisionTime": "2013-12-14T18:24:32Z"
+		},
+		{
+			"checksumSHA1": "fIBNxag9Y/C5QHTVn434fFFhGjE=",
+			"path": "github.com/pilu/fresh",
+			"revision": "7261a962d4340e348cda4f98bd43a327be23c93e",
+			"revisionTime": "2016-03-10T16:39:02Z"
+		},
+		{
+			"checksumSHA1": "tvUnuBKUSBinYyGAaqGpJBobf0E=",
+			"path": "github.com/pilu/fresh/runner",
+			"revision": "7261a962d4340e348cda4f98bd43a327be23c93e",
+			"revisionTime": "2016-03-10T16:39:02Z"
 		},
 		{
 			"checksumSHA1": "CzcsA3k48nSAuoOkDO9PU/sp/no=",
@@ -67,6 +103,12 @@
 			"path": "github.com/urfave/negroni",
 			"revision": "dcaac9107a7a6ba4cf5143afc145e2b70a1c12c2",
 			"revisionTime": "2016-06-16T02:26:26Z"
+		},
+		{
+			"checksumSHA1": "w/oQQFHCnE+S+2g5D62nfY8aDuQ=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "62bee037599929a6e9146f29d10dd5208c43507d",
+			"revisionTime": "2016-06-14T22:52:37Z"
 		}
 	],
 	"rootPath": "github.com/vjftw/orchestrate/master"
