@@ -30,3 +30,11 @@ func (gP *GORMPersister) Init() {
 func (gP *GORMPersister) Save(v interface{}) {
 	gP.DB.Save(v)
 }
+
+func (gP *GORMPersister) FindInto(
+	v interface{},
+	query interface{},
+	args ...interface{},
+) {
+	gP.DB.Where(query, args).First(v)
+}

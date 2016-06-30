@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/vjftw/orchestrate/master/features/user-management"
+	"github.com/vjftw/orchestrate/master/features/user"
+	"github.com/vjftw/orchestrate/master/features/utils"
 )
 
 func TestIntegration(t *testing.T) {
@@ -57,9 +58,12 @@ func TestIntegration(t *testing.T) {
 			}
 			So(err, ShouldBeNil)
 
-			userManagement := integrationUserManagement.UserManagementTests{}
+			apiClient := utils.APIClient{}
+			apiClient.BaseURI = "http://localhost:8734"
 
-			userManagement.UserRegistration(t)
+			userManagement := user.UserManagementTests{}
+
+			userManagement.RunTests(t, apiClient)
 
 			Convey("Stopping test binary", func() {
 				cmd.Process.Kill()

@@ -39,6 +39,9 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Encrypt Password
+	user.EncryptPassord()
+
 	// Persist the user variable
 	uC.EntityManager.Save(&user)
 
