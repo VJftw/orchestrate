@@ -12,8 +12,8 @@ type User struct {
 }
 
 // ToMap - Returns a map representation of a User
-func (u User) ToMap() map[string]string {
-	return map[string]string{
+func (u User) ToMap() map[string]interface{} {
+	return map[string]interface{}{
 		"emailAddress": u.EmailAddress,
 		"firstName":    u.FirstName,
 		"lastName":     u.LastName,

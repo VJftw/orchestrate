@@ -6,5 +6,5 @@ type IModel interface {
 
 // ISerializable -
 type ISerializable interface {
-	ToMap() map[string]string
+	ToMap() map[string]interface{}
 }

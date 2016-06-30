@@ -1,6 +1,10 @@
 package integration
 
 import (
+	"io"
+	"io/ioutil"
+	"os"
+	"os/exec"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -8,19 +12,61 @@ import (
 )
 
 func TestIntegration(t *testing.T) {
-	Convey("Given some integer with a starting value", t, func() {
-		x := 1
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode.")
+	}
+	Convey("Building test binary", t, func() {
+		cmd := exec.Command("go", "build", "-o", "integrationTest", "../")
+		stderr, err := cmd.StderrPipe()
+		if err != nil {
+			t.Error(err)
+		}
+		So(err, ShouldBeNil)
 
-		Convey("When the integer is incremented", func() {
-			x++
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			t.Error(err)
+		}
+		So(err, ShouldBeNil)
 
-			Convey("The value should be greater by one", func() {
-				So(x, ShouldEqual, 2)
+		err = cmd.Start()
+		if err != nil {
+			t.Error(err)
+		}
+		So(err, ShouldBeNil)
+
+		io.Copy(os.Stdout, stdout)
+		errBuf, _ := ioutil.ReadAll(stderr)
+
+		err = cmd.Wait()
+		if err != nil {
+			t.Error(string(errBuf))
+		}
+		So(err, ShouldBeNil)
+
+		if _, err = os.Stat("integrationTest"); os.IsNotExist(err) {
+			t.Error(err)
+		}
+		So(err, ShouldBeNil)
+
+		Convey("Starting test binary", func() {
+			cmd := exec.Command("./integrationTest")
+			err := cmd.Start()
+			if err != nil {
+				t.Error(err)
+			}
+			So(err, ShouldBeNil)
+
+			Convey("Running Integration tests", func() {
+				userManagement := integrationUserManagement.UserManagementTests{}
+
+				userManagement.UserRegistration(t)
+
+				Convey("Stopping test binary", func() {
+					cmd.Process.Kill()
+				})
 			})
 		})
 	})
 
-	userManagement := integrationUserManagement.UserManagementTests{}
-
-	userManagement.UserRegistration(t)
 }
