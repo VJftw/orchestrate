@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"testing"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/vjftw/orchestrate/master/features/user"
@@ -57,6 +58,8 @@ func TestIntegration(t *testing.T) {
 				t.Error(err)
 			}
 			So(err, ShouldBeNil)
+
+			time.Sleep(time.Second)
 
 			apiClient := utils.APIClient{}
 			apiClient.BaseURI = "http://localhost:8734"

@@ -27,7 +27,12 @@ func (uAT UserAuthTests) UserAuthentication(t *testing.T, apiClient utils.APICli
 
 			convey.Convey("Then the Response should contain a JWT", func() {
 				convey.So(apiClient.ResponseStatus, convey.ShouldEqual, 201)
+				var authResp struct {
+					AuthToken string `json:"authToken"`
+				}
+				apiClient.UnmarshalTo(&authResp)
 
+				convey.So(authResp.AuthToken, convey.ShouldNotBeEmpty)
 			})
 		})
 

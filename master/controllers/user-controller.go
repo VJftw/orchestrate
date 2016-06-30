@@ -40,7 +40,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Encrypt Password
-	user.EncryptPassord()
+	user.EncryptPassword()
 
 	// Persist the user variable
 	uC.EntityManager.Save(&user)

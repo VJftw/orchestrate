@@ -15,9 +15,17 @@ type User struct {
 	LastName     string `json:"lastName" valid:"alpha"`
 }
 
-// EncryptPassord - Sets the PasswordHash
-func (u *User) EncryptPassord() {
+// EncryptPassword - Sets the PasswordHash
+func (u *User) EncryptPassword() {
 	u.PasswordHash, _ = bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+}
+
+// VerifyPassword - Verifies Password
+func (u User) VerifyPassword() bool {
+	if bcrypt.CompareHashAndPassword(u.PasswordHash, []byte(u.Password)) == nil {
+		return true
+	}
+	return false
 }
 
 // ToMap - Returns a map representation of a User

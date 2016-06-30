@@ -3,7 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/models"
@@ -34,4 +36,27 @@ func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
 
 	aC.EntityManager.ORM.FindInto(&user, "email_address = ?", user.EmailAddress)
 
+	// Verify bcrypt Password hash
+	if user.VerifyPassword() {
+		// if valid, generate JWT with email address and ID in
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"emailAddress": user.EmailAddress,
+			"nbf":          time.Now().Unix(),
+		})
+
+		tokenString, err := token.SignedString([]byte("hmacSecret"))
+		if err != nil {
+			// 400 on Error
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		authToken := models.AuthToken{}
+		authToken.Token = tokenString
+
+		Respond(w, http.StatusCreated, authToken)
+	}
+
+	// else return 404
+	RespondNoBody(w, http.StatusNotFound)
 }

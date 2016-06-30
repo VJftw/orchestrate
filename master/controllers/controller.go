@@ -22,3 +22,8 @@ func Respond(w http.ResponseWriter, code int, v models.Serializable) {
 
 	r.JSON(w, code, v.ToMap())
 }
+
+// RespondNoBody - Writes the given status code
+func RespondNoBody(w http.ResponseWriter, code int) {
+	w.WriteHeader(code)
+}
