@@ -57,14 +57,12 @@ func TestIntegration(t *testing.T) {
 			}
 			So(err, ShouldBeNil)
 
-			Convey("Running Integration tests", func() {
-				userManagement := integrationUserManagement.UserManagementTests{}
+			userManagement := integrationUserManagement.UserManagementTests{}
 
-				userManagement.UserRegistration(t)
+			userManagement.UserRegistration(t)
 
-				Convey("Stopping test binary", func() {
-					cmd.Process.Kill()
-				})
+			Convey("Stopping test binary", func() {
+				cmd.Process.Kill()
 			})
 		})
 	})

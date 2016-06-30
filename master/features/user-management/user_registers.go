@@ -37,6 +37,7 @@ func (uM *UserManagementTests) UserRegistration(t *testing.T) {
 			}
 			apiClient.UnmarshalTo(&userResp)
 
+			convey.So(userResp.UUID, convey.ShouldNotBeEmpty)
 			convey.So(userResp.EmailAddress, convey.ShouldEqual, "foo@bar.com")
 			convey.So(userResp.FirstName, convey.ShouldEqual, "")
 			convey.So(userResp.LastName, convey.ShouldEqual, "")

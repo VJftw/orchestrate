@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -37,7 +36,6 @@ func (a *APIClient) Post(uri string, body interface{}) error {
 	a.HTTPClient = &http.Client{}
 
 	urlStr := strings.Join([]string{a.BaseURI, uri}, "")
-	fmt.Println(urlStr)
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
 		return err
