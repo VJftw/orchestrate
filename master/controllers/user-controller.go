@@ -15,13 +15,13 @@ type UserController struct {
 }
 
 // AddRoutes - Adds the routes assosciated to this controller
-func (uC *UserController) AddRoutes(r *mux.Router) {
+func (uC UserController) AddRoutes(r *mux.Router) {
 	r.
 		HandleFunc("/v1/users", uC.postHandler).
 		Methods("POST")
 }
 
-func (uC *UserController) postHandler(w http.ResponseWriter, r *http.Request) {
+func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 
 	// Unmarshal request into user variable

@@ -14,7 +14,7 @@ type Controller interface {
 }
 
 // Respond - Writes the given status code and object to the response
-func Respond(w http.ResponseWriter, code int, v models.ISerializable) {
+func Respond(w http.ResponseWriter, code int, v models.Serializable) {
 
 	r := render.New(render.Options{
 		IndentJSON: true,

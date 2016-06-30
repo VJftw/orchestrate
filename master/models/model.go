@@ -4,7 +4,7 @@ package models
 type IModel interface {
 }
 
-// ISerializable -
-type ISerializable interface {
+// Serializable -
+type Serializable interface {
 	ToMap() map[string]interface{}
 }
