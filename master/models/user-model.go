@@ -16,6 +16,7 @@ type User struct {
 	LastName     string `json:"lastName" valid:"alpha"`
 }
 
+// GetID - Return the ID
 func (u User) GetID() uint {
 	return u.ID
 }
