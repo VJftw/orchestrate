@@ -2,6 +2,7 @@ package models
 
 // IModel -
 type IModel interface {
+	GetID() uint
 }
 
 // Serializable -

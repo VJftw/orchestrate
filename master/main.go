@@ -9,6 +9,7 @@ import (
 	"github.com/facebookgo/inject"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/persisters"
+	"github.com/vjftw/orchestrate/master/services"
 )
 
 // OrchestrateApp - Orchestrate application struct
@@ -20,11 +21,13 @@ func initApp() OrchestrateApp {
 	var g inject.Graph
 	var app OrchestrateApp
 	var gormDB persisters.GORMPersister
+	var hashID services.HashIDService
 
 	err := g.Provide(
 		&inject.Object{Value: &app},
 		&inject.Object{Name: "persister gorm", Value: &gormDB},
 		&inject.Object{Name: "manager entity", Value: &managers.EntityManager{}},
+		&inject.Object{Name: "hashids", Value: &hashID},
 	)
 
 	if err != nil {
@@ -33,6 +36,7 @@ func initApp() OrchestrateApp {
 	}
 
 	gormDB.Init()
+	hashID.Init()
 
 	if err := g.Populate(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

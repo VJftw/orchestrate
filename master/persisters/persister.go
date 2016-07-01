@@ -1,7 +1,9 @@
 package persisters
 
+import "github.com/vjftw/orchestrate/master/models"
+
 // IPersister - Persistence functions
 type IPersister interface {
-	Save(interface{})
-	FindInto(interface{}, interface{}, ...interface{})
+	Save(models.IModel)
+	FindInto(models.IModel, interface{}, ...interface{})
 }

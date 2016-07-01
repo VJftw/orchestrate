@@ -21,7 +21,12 @@ func (r *Router) init() {
 	r.UserController.AddRoutes(router)
 	r.AuthController.AddRoutes(router)
 
-	n := negroni.Classic() // Includes some default middlewares
+	// n := negroni.Classic() // Includes some default middlewares
+	n := negroni.New()
+	n.Use(negroni.NewLogger())
+	n.Use(negroni.NewRecovery())
+
+	// n.Use(negroni.HandlerFunc(jwtMiddleware.HandlerWithNext))
 	n.UseHandler(router)
 
 	r.Router = n

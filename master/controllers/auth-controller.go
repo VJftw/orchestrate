@@ -40,8 +40,8 @@ func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
 	if user.VerifyPassword() {
 		// if valid, generate JWT with email address and ID in
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"emailAddress": user.EmailAddress,
-			"nbf":          time.Now().Unix(),
+			"userId": user.HashID,
+			"nbf":    time.Now().Unix(),
 		})
 
 		tokenString, err := token.SignedString([]byte("hmacSecret"))

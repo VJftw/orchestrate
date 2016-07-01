@@ -27,14 +27,27 @@ func (gP *GORMPersister) Init() {
 }
 
 // Save - saves an object using GORM
-func (gP *GORMPersister) Save(v interface{}) {
+func (gP GORMPersister) Save(v models.IModel) {
 	gP.DB.Save(v)
 }
 
-func (gP *GORMPersister) FindInto(
-	v interface{},
+func (gP GORMPersister) FindInto(
+	v models.IModel,
 	query interface{},
 	args ...interface{},
 ) {
 	gP.DB.Where(query, args).First(v)
+}
+
+func (gP GORMPersister) Exists(
+	e models.IModel,
+	query interface{},
+	args ...interface{},
+) bool {
+	gP.FindInto(e, query, args)
+
+	if e.GetID() > 0 {
+		return true
+	}
+	return false
 }

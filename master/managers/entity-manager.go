@@ -1,7 +1,10 @@
 package managers
 
 import (
+	"fmt"
+
 	"github.com/asaskevich/govalidator"
+	"github.com/vjftw/orchestrate/master/messages"
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/persisters"
 )
@@ -17,15 +20,27 @@ func (eM EntityManager) Save(entity models.IModel) {
 }
 
 // Validate - Validates a given Entity.
-func (eM EntityManager) Validate(entity models.IModel) map[string]string {
-	result, err := govalidator.ValidateStruct(entity)
+func (eM EntityManager) Validate(entity models.IModel) messages.ValidationMessage {
+	result, _ := govalidator.ValidateStruct(entity)
 
-	if result {
-		return nil
+	vM := messages.ValidationMessage{}
+	vM.Valid = result
+
+	if !vM.Valid {
+		return vM
 	}
 
-	return map[string]string{
-		"errors": err.Error(),
+	if entity, ok := entity.(*models.User); ok {
+		fmt.Println("Do user specific validation")
+		eM.ORM.FindInto(entity, "email_address = ?", entity.EmailAddress)
+		if entity.ID > 0 {
+			vM.Valid = false
+		}
+	} else {
+		fmt.Println("Do usual validation")
+		fmt.Printf("%T", entity)
 	}
+
+	return vM
 
 }
