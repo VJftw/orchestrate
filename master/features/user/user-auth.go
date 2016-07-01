@@ -19,11 +19,7 @@ func (uAT UserAuthTests) UserAuthentication(t *testing.T, apiClient utils.APICli
 				"password":     "abcd1234",
 			}
 
-			err := apiClient.Post("/v1/auth", body)
-			if err != nil {
-				t.Error(err)
-			}
-			convey.So(err, convey.ShouldBeNil)
+			apiClient.RequestWithBody("POST", "/v1/auth", body)
 
 			convey.Convey("Then the Response should contain a JWT", func() {
 				convey.So(apiClient.ResponseStatus, convey.ShouldEqual, 201)

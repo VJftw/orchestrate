@@ -6,4 +6,5 @@ import "github.com/vjftw/orchestrate/master/models"
 type IPersister interface {
 	Save(models.IModel)
 	FindInto(models.IModel, interface{}, ...interface{})
+	Exists(models.IModel, interface{}, ...interface{}) bool
 }

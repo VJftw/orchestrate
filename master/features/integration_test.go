@@ -52,6 +52,10 @@ func TestIntegration(t *testing.T) {
 		So(err, ShouldBeNil)
 
 		Convey("Starting test binary", func() {
+			if _, err = os.Stat("test.db"); os.IsNotExist(err) {
+			} else {
+				os.Remove("test.db")
+			}
 			cmd := exec.Command("./integrationTest")
 			err := cmd.Start()
 			if err != nil {
@@ -63,6 +67,7 @@ func TestIntegration(t *testing.T) {
 
 			apiClient := utils.APIClient{}
 			apiClient.BaseURI = "http://localhost:8734"
+			apiClient.T = t
 
 			userManagement := user.UserManagementTests{}
 

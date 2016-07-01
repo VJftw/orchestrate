@@ -77,9 +77,27 @@ func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if UserID exists in database
+	// get User via userID
+	var user models.User
+	uC.EntityManager.ORM.FindInto(user, "hash_id = ?", userID)
 
-	// user := context.Get(r, "user")
-	// fmt.Fprintf(w, "This is an authenticated request")
-	// fmt.Fprintf(w, "Claim content:\n")
+	if user.ID > 0 {
+		// Unmarshal request into user variable
+		err := json.NewDecoder(r.Body).Decode(&user)
+		if err != nil {
+			// 400 on Error
+			RespondNoBody(w, http.StatusBadRequest)
+			return
+		}
+
+		if len(user.Password) > 0 {
+			user.EncryptPassword()
+		}
+
+		uC.EntityManager.Save(&user)
+
+		Respond(w, http.StatusOK, user)
+	}
+
+	RespondNoBody(w, http.StatusUnauthorized)
 }
