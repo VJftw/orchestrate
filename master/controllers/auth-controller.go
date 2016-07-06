@@ -7,6 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/vjftw/orchestrate/master/ephemeral"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/models"
 )
@@ -51,7 +52,7 @@ func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		authToken := models.AuthToken{}
+		authToken := ephemeral.AuthEphemeral{}
 		authToken.Token = tokenString
 
 		Respond(w, http.StatusCreated, authToken)
