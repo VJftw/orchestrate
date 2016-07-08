@@ -35,7 +35,7 @@ func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	aC.EntityManager.ORM.FindInto(&user, "email_address = ?", user.EmailAddress)
+	// aC.EntityManager.ORM.FindInto(&user, "email_address = ?", user.EmailAddress)
 
 	// Verify bcrypt Password hash
 	if user.VerifyPassword() {

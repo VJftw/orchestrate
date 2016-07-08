@@ -10,25 +10,27 @@ import (
 	"github.com/urfave/negroni"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/models"
-	"github.com/vjftw/orchestrate/master/services"
 )
 
 // UserController - Handles actions that can be performed on Users
 type UserController struct {
-	EntityManager managers.EntityManager  `inject:"inline"`
-	HashIDService *services.HashIDService `inject:"hashids"`
+	EntityManager managers.EntityManager `inject:"inline"`
+	// HashIDService *services.HashIDService `inject:"hashids"`
 }
 
-// AddRoutes - Adds the routes assosciated to this controller
-func (uC UserController) AddRoutes(r *mux.Router) {
+func NewUserController(r *mux.Router) *UserController {
+	userController := UserController{}
+
 	r.
-		HandleFunc("/v1/users", uC.postHandler).
+		HandleFunc("/v1/users", userController.postHandler).
 		Methods("POST")
 
 	r.Handle("/v1/users/{id}", negroni.New(
 		negroni.HandlerFunc(JWTMiddleware),
-		negroni.Wrap(http.HandlerFunc(uC.putHandlerSec)),
+		negroni.Wrap(http.HandlerFunc(userController.putHandlerSec)),
 	)).Methods("PUT")
+
+	return &userController
 }
 
 func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +58,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	uC.EntityManager.Save(&user)
 
 	// Generate HashID
-	user.HashID = uC.HashIDService.GenerateHash(int(user.ID))
+	// user.HashID = uC.HashIDService.GenerateHash(int(user.ID))
 
 	// Persist the user variable
 	uC.EntityManager.Save(&user)
@@ -79,7 +81,7 @@ func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 
 	// get User via userID
 	var user models.User
-	uC.EntityManager.ORM.FindInto(user, "hash_id = ?", userID)
+	// uC.EntityManager.ORM.FindInto(user, "hash_id = ?", userID)
 
 	if user.ID > 0 {
 		// Unmarshal request into user variable

@@ -5,29 +5,26 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
-	"github.com/vjftw/orchestrate/master/controllers"
 )
 
-// Router - The application router
-type Router struct {
-	Router         http.Handler
-	UserController controllers.UserController `inject:"inline"`
-	AuthController controllers.AuthController `inject:"inline"`
+// MuxRouter - The application router
+type MuxRouter struct {
+	Router  *mux.Router
+	Handler http.Handler
 }
 
-func (r *Router) init() {
-	router := mux.NewRouter()
+func NewMuxRouter() *MuxRouter {
+	muxRouter := MuxRouter{}
 
-	r.UserController.AddRoutes(router)
-	r.AuthController.AddRoutes(router)
+	muxRouter.Router = mux.NewRouter()
 
-	// n := negroni.Classic() // Includes some default middlewares
 	n := negroni.New()
 	n.Use(negroni.NewLogger())
 	n.Use(negroni.NewRecovery())
 
-	// n.Use(negroni.HandlerFunc(jwtMiddleware.HandlerWithNext))
-	n.UseHandler(router)
+	n.UseHandler(muxRouter.Router)
 
-	r.Router = n
+	muxRouter.Handler = n
+
+	return &muxRouter
 }

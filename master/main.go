@@ -7,55 +7,51 @@ import (
 	"os"
 
 	"github.com/facebookgo/inject"
-	"github.com/vjftw/orchestrate/master/managers"
-	"github.com/vjftw/orchestrate/master/persisters"
-	"github.com/vjftw/orchestrate/master/services"
+	"github.com/vjftw/orchestrate/master/controllers"
 )
 
 // OrchestrateApp - Orchestrate application struct
 type OrchestrateApp struct {
-	Router *Router `inject:""`
+	graph  *inject.Graph
+	Router *MuxRouter `inject:"default.router"`
 }
 
-func initApp() OrchestrateApp {
-	var g inject.Graph
-	var app OrchestrateApp
-	var gormDB persisters.GORMPersister
-	var hashID services.HashIDService
+// NewOrchestrateApp - Initialise with Depencency Injection
+func NewOrchestrateApp() *OrchestrateApp {
+	orchestrateApp := OrchestrateApp{}
+	orchestrateApp.graph = new(inject.Graph)
 
-	err := g.Provide(
-		&inject.Object{Value: &app},
-		&inject.Object{Name: "persister gorm", Value: &gormDB},
-		&inject.Object{Name: "manager entity", Value: &managers.EntityManager{}},
-		&inject.Object{Name: "hashids", Value: &hashID},
+	// var gormPersister persisters.GORMPersister
+
+	muxRouter := NewMuxRouter()
+
+	orchestrateApp.graph.Provide(
+		&inject.Object{Value: &orchestrateApp},
+		// &inject.Object{Name: "persister.gorm", Value: &gormPersister},
+		&inject.Object{Name: "default.router", Value: muxRouter},
+		&inject.Object{
+			Name:  "controller.user",
+			Value: controllers.NewUserController(muxRouter.Router),
+		},
 	)
 
-	if err != nil {
+	if err := orchestrateApp.graph.Populate(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	gormDB.Init()
-	hashID.Init()
+	fmt.Println(orchestrateApp.graph.Objects())
 
-	if err := g.Populate(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	app.Router.init()
-
-	return app
+	return &orchestrateApp
 }
 
 // AppEngine - For use in Google AppEngine
 func AppEngine() {
-	app := initApp()
-
-	http.Handle("/", app.Router.Router)
+	app := NewOrchestrateApp()
+	http.Handle("/", app.Router.Handler)
 }
 
 func main() {
-	app := initApp()
-	log.Fatal(http.ListenAndServe(":8734", app.Router.Router))
+	app := NewOrchestrateApp()
+	log.Fatal(http.ListenAndServe(":8734", app.Router.Handler))
 }
