@@ -1,2 +1,6 @@
+# Glide Golang depdendency management
+.glide
+vendor
+
 master
 features/integrationTest
