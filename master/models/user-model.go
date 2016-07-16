@@ -8,7 +8,7 @@ import (
 // User - A user of the application
 type User struct {
 	gorm.Model
-	HashID       string `json:"id" gorm:"unique"`
+	UUID         []byte `json:"uuid" gorm:"unique"`
 	EmailAddress string `json:"emailAddress" gorm:"not null;unique;index" valid:"email,required"`
 	Password     string `json:"password" gorm:"-" valid:"length(6|255),required"`
 	PasswordHash []byte `gorm:"non null"`
@@ -16,9 +16,9 @@ type User struct {
 	LastName     string `json:"lastName" valid:"alpha"`
 }
 
-// GetID - Return the ID
-func (u User) GetID() uint {
-	return u.ID
+// GetUUID - Return the UUID
+func (u User) GetUUID() []byte {
+	return u.UUID
 }
 
 // EncryptPassword - Sets the PasswordHash
@@ -37,7 +37,7 @@ func (u User) VerifyPassword() bool {
 // ToMap - Returns a map representation of a User
 func (u User) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"id":           u.HashID,
+		"uuid":         string(u.UUID),
 		"emailAddress": u.EmailAddress,
 		"firstName":    u.FirstName,
 		"lastName":     u.LastName,

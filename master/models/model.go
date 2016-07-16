@@ -1,8 +1,8 @@
 package models
 
-// IModel -
-type IModel interface {
-	GetID() uint
+// Model -
+type Model interface {
+	GetUUID() []byte
 }
 
 // Serializable -

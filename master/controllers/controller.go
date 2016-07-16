@@ -32,6 +32,7 @@ func RespondNoBody(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 }
 
+// JWTMiddleware -
 func JWTMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
 	tokenString, err := fromAuthHeader(r)

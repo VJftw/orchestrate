@@ -14,12 +14,12 @@ type EntityManager struct {
 }
 
 // Save - Persist a new or existing Entity. May be stored on multiple storage backends (PGSQL, Redis, etc.)
-func (eM EntityManager) Save(entity models.IModel) {
+func (eM EntityManager) Save(entity models.Model) {
 	// eM.ORM.Save(entity)
 }
 
 // Validate - Validates a given Entity.
-func (eM EntityManager) Validate(entity models.IModel) messages.ValidationMessage {
+func (eM EntityManager) Validate(entity models.Model) messages.ValidationMessage {
 	result, _ := govalidator.ValidateStruct(entity)
 
 	vM := messages.ValidationMessage{}

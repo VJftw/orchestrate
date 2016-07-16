@@ -2,9 +2,10 @@ package persisters
 
 import "github.com/vjftw/orchestrate/master/models"
 
-// IPersister - Persistence functions
-type IPersister interface {
-	Save(models.IModel)
-	FindInto(models.IModel, interface{}, ...interface{})
-	Exists(models.IModel, interface{}, ...interface{}) bool
+// Persister - Persistence functions
+type Persister interface {
+	Save(models.Model)
+	FindInto(models.Model, interface{}, ...interface{})
+	Exists(models.Model, interface{}, ...interface{}) bool
+	Delete(models.Model) bool
 }

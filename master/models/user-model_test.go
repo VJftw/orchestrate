@@ -9,23 +9,22 @@ import (
 func TestUserModel(t *testing.T) {
 	convey.Convey("Given a User", t, func() {
 		user := User{
-			HashID:       "abcdef",
+			UUID:         []byte("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
 			EmailAddress: "foo@bar.com",
 			Password:     "abc1234",
 			FirstName:    "Foo",
 			LastName:     "Bar",
 		}
-		user.ID = 2
 
 		convey.Convey("It should return a serializable map", func() {
-			convey.So(user.ToMap()["id"], convey.ShouldEqual, "abcdef")
+			convey.So(user.ToMap()["uuid"], convey.ShouldEqual, "6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 			convey.So(user.ToMap()["emailAddress"], convey.ShouldEqual, "foo@bar.com")
 			convey.So(user.ToMap()["firstName"], convey.ShouldEqual, "Foo")
 			convey.So(user.ToMap()["lastName"], convey.ShouldEqual, "Bar")
 		})
 
-		convey.Convey("It should return the ID", func() {
-			convey.So(user.GetID(), convey.ShouldEqual, 2)
+		convey.Convey("It should return the UUID", func() {
+			convey.So(string(user.GetUUID()), convey.ShouldEqual, "6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 		})
 
 		convey.Convey("It should encrypt the password", func() {

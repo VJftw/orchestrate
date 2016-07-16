@@ -10,12 +10,14 @@ import (
 
 // GORMPersister - Persistence using the GORM library
 type GORMPersister struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
-// Init - Initialises a new database
-func (gP *GORMPersister) Init() {
+func NewGORMPersister() *GORMPersister {
+	gormPersister := GORMPersister{}
+
 	db, err := gorm.Open("sqlite3", "test.db")
+
 	if err != nil {
 		fmt.Println(err)
 		panic("failed to connect database")
@@ -23,31 +25,38 @@ func (gP *GORMPersister) Init() {
 
 	db.AutoMigrate(&models.User{})
 
-	gP.DB = db
+	gormPersister.db = db
+
+	return &gormPersister
 }
 
 // Save - saves an object using GORM
-func (gP GORMPersister) Save(v models.IModel) {
-	gP.DB.Save(v)
+func (gP GORMPersister) Save(v models.Model) {
+	gP.db.Save(v)
 }
 
 func (gP GORMPersister) FindInto(
-	v models.IModel,
+	v models.Model,
 	query interface{},
 	args ...interface{},
 ) {
-	gP.DB.Where(query, args).First(v)
+	gP.db.Where(query, args).First(v)
 }
 
 func (gP GORMPersister) Exists(
-	e models.IModel,
+	e models.Model,
 	query interface{},
 	args ...interface{},
 ) bool {
 	gP.FindInto(e, query, args)
 
-	if e.GetID() > 0 {
+	if len(e.GetUUID()) > 0 {
 		return true
 	}
 	return false
+}
+
+func (gP GORMPersister) Delete(m models.Model) bool {
+	gP.db.Delete(m, nil)
+	return true
 }

@@ -8,6 +8,9 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/vjftw/orchestrate/master/controllers"
+	"github.com/vjftw/orchestrate/master/managers"
+	"github.com/vjftw/orchestrate/master/persisters"
+	"github.com/vjftw/orchestrate/master/validators"
 )
 
 // OrchestrateApp - Orchestrate application struct
@@ -27,20 +30,20 @@ func NewOrchestrateApp() *OrchestrateApp {
 
 	orchestrateApp.graph.Provide(
 		&inject.Object{Value: &orchestrateApp},
-		// &inject.Object{Name: "persister.gorm", Value: &gormPersister},
+		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORMPersister()},
+		&inject.Object{Name: "manager.default", Value: managers.ModelManager{}},
 		&inject.Object{Name: "default.router", Value: muxRouter},
 		&inject.Object{
 			Name:  "controller.user",
 			Value: controllers.NewUserController(muxRouter.Router),
 		},
+		&inject.Object{Name: "validator.user", Value: validators.UserValidator{}},
 	)
 
 	if err := orchestrateApp.graph.Populate(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
-	fmt.Println(orchestrateApp.graph.Objects())
 
 	return &orchestrateApp
 }

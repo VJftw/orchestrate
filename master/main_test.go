@@ -10,14 +10,28 @@ func TestOrchestrateApp(t *testing.T) {
 	convey.Convey("Given an Orchestrate App", t, func() {
 		app := NewOrchestrateApp()
 
-		convey.Convey("There should be a default.router", func() {
-			hasService := false
+		convey.Convey("All the services should be present", func() {
+			services := map[string]bool{
+				"default.router":  false,
+				"persister.gorm":  false,
+				"manager.default": false,
+				"controller.user": false,
+				"validator.user":  false,
+			}
+
 			for _, element := range app.graph.Objects() {
-				if element.Name == "default.router" {
-					hasService = true
+				for serviceName := range services {
+					if element.Name == serviceName {
+						services[serviceName] = true
+						break
+					}
 				}
 			}
-			convey.So(hasService, convey.ShouldBeTrue)
+
+			for _, value := range services {
+				convey.So(value, convey.ShouldBeTrue)
+			}
+
 		})
 	})
 }

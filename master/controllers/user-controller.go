@@ -2,22 +2,24 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
+	"github.com/satori/go.uuid"
 	"github.com/urfave/negroni"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/models"
+	"github.com/vjftw/orchestrate/master/validators"
 )
 
 // UserController - Handles actions that can be performed on Users
 type UserController struct {
-	EntityManager managers.EntityManager `inject:"inline"`
-	// HashIDService *services.HashIDService `inject:"hashids"`
+	ModelManager  managers.Manager     `inject:"manager.default"`
+	UserValidator validators.Validator `inject:"validator.user"`
 }
 
+// NewUserController - Returns a new UserController
 func NewUserController(r *mux.Router) *UserController {
 	userController := UserController{}
 
@@ -45,8 +47,8 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user variable
-	vM := uC.EntityManager.Validate(&user)
-	if vM.Valid == false {
+	res, vM := uC.UserValidator.Validate(&user)
+	if res == false {
 		Respond(w, http.StatusBadRequest, vM)
 		return
 	}
@@ -54,14 +56,9 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	// Encrypt Password
 	user.EncryptPassword()
 
+	user.UUID = uuid.NewV4().Bytes()
 	// Persist the user variable
-	uC.EntityManager.Save(&user)
-
-	// Generate HashID
-	// user.HashID = uC.HashIDService.GenerateHash(int(user.ID))
-
-	// Persist the user variable
-	uC.EntityManager.Save(&user)
+	uC.ModelManager.Save(&user)
 
 	// write the user variable to output and set http header to 201
 	Respond(w, http.StatusCreated, user)
@@ -69,21 +66,20 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 
 func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userID := vars["id"]
-	authenticatedUserID := context.Get(r, "userID")
-	fmt.Println(authenticatedUserID)
+	userUUID := vars["id"]
+	authenticatedUserUUID := context.Get(r, "userUUID")
 
 	// Quick check for route
-	if userID != authenticatedUserID {
+	if userUUID != authenticatedUserUUID {
 		RespondNoBody(w, http.StatusForbidden)
 		return
 	}
 
-	// get User via userID
+	// get User via userUUID
 	var user models.User
-	// uC.EntityManager.ORM.FindInto(user, "hash_id = ?", userID)
+	uC.ModelManager.GetInto(user, "uuid = ?", userUUID)
 
-	if user.ID > 0 {
+	if len(user.EmailAddress) > 0 {
 		// Unmarshal request into user variable
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
@@ -92,11 +88,18 @@ func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// validate the user variable
+		res, vM := uC.UserValidator.Validate(&user)
+		if res == false {
+			Respond(w, http.StatusBadRequest, vM)
+			return
+		}
+
 		if len(user.Password) > 0 {
 			user.EncryptPassword()
 		}
 
-		uC.EntityManager.Save(&user)
+		uC.ModelManager.Save(&user)
 
 		Respond(w, http.StatusOK, user)
 	}
