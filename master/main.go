@@ -10,13 +10,15 @@ import (
 	"github.com/vjftw/orchestrate/master/controllers"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/persisters"
+	"github.com/vjftw/orchestrate/master/providers"
+	"github.com/vjftw/orchestrate/master/routers"
 	"github.com/vjftw/orchestrate/master/validators"
 )
 
 // OrchestrateApp - Orchestrate application struct
 type OrchestrateApp struct {
 	graph  *inject.Graph
-	Router *MuxRouter `inject:"default.router"`
+	Router *routers.MuxRouter `inject:"default.router"`
 }
 
 // NewOrchestrateApp - Initialise with Depencency Injection
@@ -26,7 +28,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 
 	// var gormPersister persisters.GORMPersister
 
-	muxRouter := NewMuxRouter()
+	muxRouter := routers.NewMuxRouter()
 
 	orchestrateApp.graph.Provide(
 		&inject.Object{Value: &orchestrateApp},
@@ -35,9 +37,10 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&inject.Object{Name: "default.router", Value: muxRouter},
 		&inject.Object{
 			Name:  "controller.user",
-			Value: controllers.NewUserController(muxRouter.Router),
+			Value: controllers.NewUserController(muxRouter),
 		},
 		&inject.Object{Name: "validator.user", Value: validators.UserValidator{}},
+		&inject.Object{Name: "provider.user", Value: providers.UserProvider{}},
 	)
 
 	if err := orchestrateApp.graph.Populate(); err != nil {

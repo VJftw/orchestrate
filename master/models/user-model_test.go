@@ -9,7 +9,7 @@ import (
 func TestUserModel(t *testing.T) {
 	convey.Convey("Given a User", t, func() {
 		user := User{
-			UUID:         []byte("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
+			UUID:         "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
 			EmailAddress: "foo@bar.com",
 			Password:     "abc1234",
 			FirstName:    "Foo",

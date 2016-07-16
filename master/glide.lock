@@ -1,5 +1,5 @@
-hash: 6e9e418121a23d34c7fbb82b12dda5c6802c3d3a50d695357e616cefec7d3157
-updated: 2016-07-16T00:46:58.762732558+01:00
+hash: d2108f809920500fba8f8408e762da61c1b7c35a5f8759f45573b129f28902d5
+updated: 2016-07-16T12:17:06.554535396+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -9,6 +9,11 @@ imports:
   version: 643b7206b487b04fbea325cf6e8d06a66f8db772
 - name: github.com/facebookgo/structtag
   version: 217e25fb96916cc60332e399c9aa63f5c422ceed
+- name: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
+  subpackages:
+  - gomock
+  - mockgen
 - name: github.com/gorilla/context
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux

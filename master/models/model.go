@@ -2,7 +2,7 @@ package models
 
 // Model -
 type Model interface {
-	GetUUID() []byte
+	GetUUID() string
 }
 
 // Serializable -

@@ -6,22 +6,27 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
-	"github.com/vjftw/orchestrate/master/ephemeral"
-	"github.com/vjftw/orchestrate/master/managers"
+	"github.com/unrolled/render"
 	"github.com/vjftw/orchestrate/master/models"
+	"github.com/vjftw/orchestrate/master/models/ephemeral"
+	"github.com/vjftw/orchestrate/master/routers"
 )
 
 // AuthController - Handles authentication
 type AuthController struct {
-	EntityManager managers.EntityManager `inject:"inline"`
+	render *render.Render
 }
 
-// AddRoutes - Adds the routes assosciated to this controller
-func (aC AuthController) AddRoutes(r *mux.Router) {
-	r.
-		HandleFunc("/v1/auth", aC.authHandler).
+func NewAuthController(router *routers.MuxRouter) *AuthController {
+	authController := AuthController{
+		render: router.Render,
+	}
+
+	router.Router.
+		HandleFunc("/v1/auth", authController.authHandler).
 		Methods("POST")
+
+	return &authController
 }
 
 func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,9 +60,9 @@ func (aC AuthController) authHandler(w http.ResponseWriter, r *http.Request) {
 		authToken := ephemeral.AuthEphemeral{}
 		authToken.Token = tokenString
 
-		Respond(w, http.StatusCreated, authToken)
+		aC.render.JSON(w, http.StatusCreated, authToken.ToMap())
 	}
 
 	// else return 404
-	RespondNoBody(w, http.StatusNotFound)
+	aC.render.JSON(w, http.StatusNotFound, nil)
 }
