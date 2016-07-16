@@ -30,7 +30,7 @@ def test(ctx):
     )
     Docker.run(cli,
         tag="{0}-dev".format(flow.get_branch_container_name()),
-        command='/bin/sh -c "go test -v $(glide novendor)"',
+        command='/bin/sh -c "go test -v -cover $(glide novendor)"',
         volumes=[
             "{0}:/go/src/github.com/vjftw/orchestrate/master".format(os.getcwd())
         ],
