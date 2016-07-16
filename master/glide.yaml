@@ -26,7 +26,6 @@ import:
 - package: github.com/golang/mock
   subpackages:
   - gomock
-  - mockgen
 testImport:
 - package: github.com/smartystreets/goconvey
   version: ^1.6.2
