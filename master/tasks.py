@@ -1,4 +1,16 @@
 from invoke import task
+from docker import Client
+from idflow import Utils, Docker, Flow
+import os
+
+Utils.print_system_info()
+
+cli = Client(base_url='unix://var/run/docker.sock', timeout=600)
+
+flow = Flow(
+    repository="vjftw/orchestrate",
+    prefix="master"
+)
 
 @task
 def test(ctx):
