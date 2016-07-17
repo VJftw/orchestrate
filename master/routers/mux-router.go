@@ -15,19 +15,29 @@ type MuxRouter struct {
 	Handler http.Handler
 }
 
-func NewMuxRouter() *MuxRouter {
+type Routable interface {
+	Setup(*mux.Router, *render.Render)
+}
+
+func NewMuxRouter(controllers []Routable, logging bool) *MuxRouter {
 	muxRouter := MuxRouter{}
 
 	muxRouter.Render = render.New()
 	muxRouter.Router = mux.NewRouter()
 
 	n := negroni.New()
-	n.Use(negroni.NewLogger())
+	if logging {
+		n.Use(negroni.NewLogger())
+	}
 	n.Use(negroni.NewRecovery())
 
 	n.UseHandler(muxRouter.Router)
 
 	muxRouter.Handler = n
+
+	for _, controller := range controllers {
+		controller.Setup(muxRouter.Router, muxRouter.Render)
+	}
 
 	return &muxRouter
 }

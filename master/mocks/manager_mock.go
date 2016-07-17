@@ -29,9 +29,9 @@ func (_m *MockManager) EXPECT() *_MockManagerRecorder {
 	return _m.recorder
 }
 
-func (_m *MockManager) Delete(_param0 models.Model) bool {
+func (_m *MockManager) Delete(_param0 models.Model) error {
 	ret := _m.ctrl.Call(_m, "Delete", _param0)
-	ret0, _ := ret[0].(bool)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
@@ -39,13 +39,13 @@ func (_mr *_MockManagerRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Delete", arg0)
 }
 
-func (_m *MockManager) GetInto(_param0 models.Model, _param1 interface{}, _param2 ...interface{}) bool {
+func (_m *MockManager) GetInto(_param0 models.Model, _param1 interface{}, _param2 ...interface{}) error {
 	_s := []interface{}{_param0, _param1}
 	for _, _x := range _param2 {
 		_s = append(_s, _x)
 	}
 	ret := _m.ctrl.Call(_m, "GetInto", _s...)
-	ret0, _ := ret[0].(bool)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 

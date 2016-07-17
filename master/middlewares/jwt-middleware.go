@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -37,11 +38,17 @@ func (m *JWTMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next 
 		return []byte("hmacSecret"), nil
 	})
 
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims)
-		context.Set(r, "userID", claims["userId"])
+		// fmt.Println(claims)
+		context.Set(r, "userUUID", claims["userUUID"])
 	} else {
 		fmt.Println(err)
+		return
 	}
 	next(rw, r)
 }
@@ -51,7 +58,7 @@ func (m *JWTMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next 
 func fromAuthHeader(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		return "", nil // No error, just no token
+		return "", errors.New("Missing Token")
 	}
 
 	// TODO: Make this a bit more robust, parsing-wise

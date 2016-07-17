@@ -19,36 +19,55 @@ import (
 // OrchestrateApp - Orchestrate application struct
 type OrchestrateApp struct {
 	graph  *inject.Graph
-	Router *routers.MuxRouter `inject:"default.router"`
+	Router *routers.MuxRouter
+}
+
+type injectLogger struct {
+}
+
+func (l injectLogger) Debugf(format string, v ...interface{}) {
+	fmt.Println(fmt.Sprintf(format, v))
 }
 
 // NewOrchestrateApp - Initialise with Depencency Injection
 func NewOrchestrateApp() *OrchestrateApp {
 	orchestrateApp := OrchestrateApp{}
-	orchestrateApp.graph = new(inject.Graph)
+	orchestrateApp.graph = &inject.Graph{
+	// Logger: injectLogger{},
+	}
 
-	// var gormPersister persisters.GORMPersister
+	var userController controllers.UserController
 
-	muxRouter := routers.NewMuxRouter()
-
-	orchestrateApp.graph.Provide(
-		&inject.Object{Value: &orchestrateApp},
+	err := orchestrateApp.graph.Provide(
 		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORMPersister()},
-		&inject.Object{Name: "manager.default", Value: managers.ModelManager{}},
-		&inject.Object{Name: "default.router", Value: muxRouter},
+		&inject.Object{Name: "manager.default", Value: &managers.ModelManager{}},
+		&inject.Object{Name: "validator.user", Value: &validators.UserValidator{}},
+		&inject.Object{Name: "provider.user", Value: providers.NewUserProvider()},
+		&inject.Object{Name: "resolver.user", Value: &resolvers.UserResolver{}},
 		&inject.Object{
 			Name:  "controller.user",
-			Value: controllers.NewUserController(muxRouter),
+			Value: &userController,
 		},
-		&inject.Object{Name: "validator.user", Value: validators.UserValidator{}},
-		&inject.Object{Name: "provider.user", Value: providers.UserProvider{}},
-		&inject.Object{Name: "resolver.user", Value: resolvers.UserResolver{}},
 	)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	if err := orchestrateApp.graph.Populate(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	// for _, element := range orchestrateApp.graph.Objects() {
+	// 	fmt.Println(element.Name, &element.Value)
+	// }
+
+	muxRouter := routers.NewMuxRouter([]routers.Routable{
+		&userController,
+	}, true)
+
+	orchestrateApp.Router = muxRouter
 
 	return &orchestrateApp
 }

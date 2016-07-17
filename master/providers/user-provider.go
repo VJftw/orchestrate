@@ -9,6 +9,10 @@ type IUserProvider interface {
 type UserProvider struct {
 }
 
+func NewUserProvider() *UserProvider {
+	return &UserProvider{}
+}
+
 func (uP UserProvider) New() *models.User {
 	return &models.User{}
 }

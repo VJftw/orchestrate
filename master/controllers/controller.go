@@ -1,8 +1,11 @@
 package controllers
 
-import "github.com/gorilla/mux"
+import (
+	"github.com/gorilla/mux"
+	"github.com/unrolled/render"
+)
 
 // Controller - Interface that defines methods that all controllers should have
 type Controller interface {
-	AddRoutes(mux.Router)
+	Setup(*mux.Router, *render.Render)
 }

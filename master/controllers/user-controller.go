@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/context"
@@ -11,10 +10,8 @@ import (
 	"github.com/urfave/negroni"
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/middlewares"
-	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/providers"
 	"github.com/vjftw/orchestrate/master/resolvers"
-	"github.com/vjftw/orchestrate/master/routers"
 	"github.com/vjftw/orchestrate/master/validators"
 )
 
@@ -27,22 +24,19 @@ type UserController struct {
 	UserResolver  resolvers.IUserResolver `inject:"resolver.user"`
 }
 
-// NewUserController - Returns a new UserController
-func NewUserController(router *routers.MuxRouter) *UserController {
-	userController := UserController{
-		render: router.Render,
-	}
+// Setup - Sets up the controller
+func (uC *UserController) Setup(router *mux.Router, renderer *render.Render) {
+	uC.render = renderer
 
-	router.Router.
-		HandleFunc("/v1/users", userController.postHandler).
+	router.
+		HandleFunc("/v1/users", uC.postHandler).
 		Methods("POST")
 
-	router.Router.Handle("/v1/users/{id}", negroni.New(
-		middlewares.NewJWTMiddleware(router.Render),
-		negroni.Wrap(http.HandlerFunc(userController.putHandlerSec)),
+	router.Handle("/v1/users/{id}", negroni.New(
+		middlewares.NewJWTMiddleware(renderer),
+		negroni.Wrap(http.HandlerFunc(uC.putHandlerSec)),
 	)).Methods("PUT")
 
-	return &userController
 }
 
 func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +68,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userUUID := vars["id"]
+	userUUID := mux.Vars(r)["id"]
 	authenticatedUserUUID := context.Get(r, "userUUID")
 
 	// Quick check for route
@@ -85,33 +78,34 @@ func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get User via userUUID
-	var user models.User
-	uC.ModelManager.GetInto(user, "uuid = ?", userUUID)
+	user := uC.UserProvider.New()
 
-	if len(user.EmailAddress) > 0 {
-		// Unmarshal request into user variable
-		err := json.NewDecoder(r.Body).Decode(&user)
-		if err != nil {
-			// 400 on Error
-			uC.render.JSON(w, http.StatusBadRequest, nil)
-			return
-		}
-
-		// validate the user variable
-		res, vM := uC.UserValidator.Validate(&user)
-		if res == false {
-			uC.render.JSON(w, http.StatusBadRequest, vM.ToMap())
-			return
-		}
-
-		if len(user.Password) > 0 {
-			user.EncryptPassword()
-		}
-
-		uC.ModelManager.Save(&user)
-
-		uC.render.JSON(w, http.StatusOK, user.ToMap())
+	err := uC.ModelManager.GetInto(user, "uuid = ?", userUUID)
+	if err != nil {
+		uC.render.JSON(w, http.StatusNotFound, nil)
+		return
 	}
 
-	uC.render.JSON(w, http.StatusUnauthorized, nil)
+	// Unmarshal request into user variable
+	err = uC.UserResolver.FromRequest(user, r.Body)
+	if err != nil {
+		uC.render.JSON(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	// validate the user variable
+	res, _ := uC.UserValidator.Validate(user)
+	if res == false {
+		uC.render.JSON(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	if len(user.Password) > 0 {
+		user.EncryptPassword()
+	}
+
+	uC.ModelManager.Save(user)
+
+	uC.render.JSON(w, http.StatusOK, user.ToMap())
+
 }

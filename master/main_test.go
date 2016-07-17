@@ -12,7 +12,6 @@ func TestOrchestrateApp(t *testing.T) {
 
 		convey.Convey("All the services should be present", func() {
 			services := map[string]bool{
-				"default.router":  false,
 				"persister.gorm":  false,
 				"manager.default": false,
 				"controller.user": false,
