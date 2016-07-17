@@ -11,6 +11,7 @@ import (
 	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/persisters"
 	"github.com/vjftw/orchestrate/master/providers"
+	"github.com/vjftw/orchestrate/master/resolvers"
 	"github.com/vjftw/orchestrate/master/routers"
 	"github.com/vjftw/orchestrate/master/validators"
 )
@@ -41,6 +42,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		},
 		&inject.Object{Name: "validator.user", Value: validators.UserValidator{}},
 		&inject.Object{Name: "provider.user", Value: providers.UserProvider{}},
+		&inject.Object{Name: "resolver.user", Value: resolvers.UserResolver{}},
 	)
 
 	if err := orchestrateApp.graph.Populate(); err != nil {

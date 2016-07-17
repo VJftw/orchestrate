@@ -13,6 +13,7 @@ import (
 	"github.com/vjftw/orchestrate/master/middlewares"
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/providers"
+	"github.com/vjftw/orchestrate/master/resolvers"
 	"github.com/vjftw/orchestrate/master/routers"
 	"github.com/vjftw/orchestrate/master/validators"
 )
@@ -23,6 +24,7 @@ type UserController struct {
 	ModelManager  managers.Manager        `inject:"manager.default"`
 	UserValidator validators.Validator    `inject:"validator.user"`
 	UserProvider  providers.IUserProvider `inject:"provider.user"`
+	UserResolver  resolvers.IUserResolver `inject:"resolver.user"`
 }
 
 // NewUserController - Returns a new UserController
@@ -47,7 +49,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	user := uC.UserProvider.New()
 
 	// Unmarshal request into user variable
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err := uC.UserResolver.FromRequest(user, r.Body)
 	if err != nil {
 		uC.render.JSON(w, http.StatusBadRequest, nil)
 		return
@@ -60,10 +62,10 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Encrypt Password
+	// Encrypt Password and generate UUID
 	user.EncryptPassword()
-	//
 	user.UUID = uuid.NewV4().String()
+
 	// Persist the user variable
 	uC.ModelManager.Save(user)
 

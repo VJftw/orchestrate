@@ -18,6 +18,7 @@ type MuxRouter struct {
 func NewMuxRouter() *MuxRouter {
 	muxRouter := MuxRouter{}
 
+	muxRouter.Render = render.New()
 	muxRouter.Router = mux.NewRouter()
 
 	n := negroni.New()
@@ -27,8 +28,6 @@ func NewMuxRouter() *MuxRouter {
 	n.UseHandler(muxRouter.Router)
 
 	muxRouter.Handler = n
-
-	muxRouter.Render = render.New()
 
 	return &muxRouter
 }

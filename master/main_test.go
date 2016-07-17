@@ -18,6 +18,7 @@ func TestOrchestrateApp(t *testing.T) {
 				"controller.user": false,
 				"validator.user":  false,
 				"provider.user":   false,
+				"resolver.user":   false,
 			}
 
 			for _, element := range app.graph.Objects() {

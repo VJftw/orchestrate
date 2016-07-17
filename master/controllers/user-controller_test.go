@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,39 +12,25 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/smartystreets/goconvey/convey"
 	"github.com/unrolled/render"
-	"github.com/vjftw/orchestrate/master/managers"
 	"github.com/vjftw/orchestrate/master/messages"
+	"github.com/vjftw/orchestrate/master/mocks"
 	"github.com/vjftw/orchestrate/master/models"
-	"github.com/vjftw/orchestrate/master/providers"
-	"github.com/vjftw/orchestrate/master/validators"
 )
-
-type MockResponseWriter struct {
-}
-
-func (mRW MockResponseWriter) Header() http.Header {
-	return http.Header{}
-}
-
-func (mRW MockResponseWriter) Write(d []byte) (int, error) {
-	return 0, nil
-}
-
-func (mRW MockResponseWriter) WriteHeader(s int) {
-}
 
 func TestUserController(t *testing.T) {
 	convey.Convey("Given a User Controller", t, func() {
 		ctrl := gomock.NewController(t)
-		modelManager := managers.NewMockManager(ctrl)
-		userValidator := validators.NewMockValidator(ctrl)
-		userProvider := providers.NewMockIUserProvider(ctrl)
+		modelManager := mocks.NewMockManager(ctrl)
+		userValidator := mocks.NewMockValidator(ctrl)
+		userProvider := mocks.NewMockIUserProvider(ctrl)
+		userResolver := mocks.NewMockIUserResolver(ctrl)
 		defer ctrl.Finish()
 		userController := UserController{
 			render:        render.New(),
 			ModelManager:  modelManager,
 			UserValidator: userValidator,
 			UserProvider:  userProvider,
+			UserResolver:  userResolver,
 		}
 
 		convey.Convey("When there is a valid POST request", func() {
@@ -57,6 +44,7 @@ func TestUserController(t *testing.T) {
 
 			user := models.User{}
 			userProvider.EXPECT().New().Times(1).Return(&user)
+			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
 			modelManager.EXPECT().Save(&user).Times(1)
 			userValidator.EXPECT().Validate(&user).Times(1).Return(true, nil)
 
@@ -70,9 +58,6 @@ func TestUserController(t *testing.T) {
 				json.Unmarshal(rw.Body.Bytes(), &jsonResp)
 
 				convey.So(jsonResp["uuid"], convey.ShouldNotBeEmpty)
-				convey.So(jsonResp["emailAddress"], convey.ShouldEqual, "foo@bar.com")
-				convey.So(jsonResp["firstName"], convey.ShouldEqual, "")
-				convey.So(jsonResp["lastName"], convey.ShouldEqual, "")
 			})
 		})
 
@@ -87,6 +72,7 @@ func TestUserController(t *testing.T) {
 
 			user := models.User{}
 			userProvider.EXPECT().New().Times(1).Return(&user)
+			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
 			vM := messages.ValidationMessage{}
 			userValidator.EXPECT().Validate(&user).Times(1).Return(false, &vM)
 			modelManager.EXPECT().Save(&user).Times(0)
@@ -107,6 +93,7 @@ func TestUserController(t *testing.T) {
 
 			user := models.User{}
 			userProvider.EXPECT().New().Times(1).Return(&user)
+			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(errors.New("Malformed"))
 			userValidator.EXPECT().Validate(&user).Times(0)
 			modelManager.EXPECT().Save(&user).Times(0)
 
@@ -117,5 +104,6 @@ func TestUserController(t *testing.T) {
 				convey.So(rw.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 			})
 		})
+
 	})
 }
