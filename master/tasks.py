@@ -35,5 +35,7 @@ def test(ctx):
             "{0}:/go/src/github.com/vjftw/orchestrate/master".format(os.getcwd())
         ],
         working_dir="/go/src/github.com/vjftw/orchestrate/master",
-        environment={}
+        environment={
+            "TERM": "xterm-color"
+        }
     )
