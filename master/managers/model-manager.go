@@ -1,8 +1,6 @@
 package managers
 
 import (
-	"errors"
-
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/persisters"
 )
@@ -13,8 +11,9 @@ type ModelManager struct {
 }
 
 // Save - Saves the model across storages
-func (mM ModelManager) Save(m models.Model) {
+func (mM ModelManager) Save(m models.Model) error {
 	mM.GORMPersister.Save(m)
+	return nil
 }
 
 // GetInto - Searches the storages for a model identified by the query and places it into the given model reference.
@@ -23,12 +22,12 @@ func (mM ModelManager) GetInto(m models.Model, query interface{}, args ...interf
 	// check cache
 
 	// check database
-	mM.GORMPersister.FindInto(m, query, args)
-	if len(m.GetUUID()) > 0 {
-		return nil
+	err := mM.GORMPersister.GetInto(m, query, args)
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Not found")
+	return nil
 }
 
 // Delete - Deletes a model from the storages

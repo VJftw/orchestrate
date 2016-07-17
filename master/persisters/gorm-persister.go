@@ -31,32 +31,21 @@ func NewGORMPersister() *GORMPersister {
 }
 
 // Save - saves an object using GORM
-func (gP GORMPersister) Save(v models.Model) {
+func (gP GORMPersister) Save(v models.Model) error {
 	gP.db.Save(v)
+	return nil
 }
 
-func (gP GORMPersister) FindInto(
+func (gP GORMPersister) GetInto(
 	v models.Model,
 	query interface{},
 	args ...interface{},
-) {
+) error {
 	gP.db.Where(query, args).First(v)
+	return nil
 }
 
-func (gP GORMPersister) Exists(
-	e models.Model,
-	query interface{},
-	args ...interface{},
-) bool {
-	gP.FindInto(e, query, args)
-
-	if len(e.GetUUID()) > 0 {
-		return true
-	}
-	return false
-}
-
-func (gP GORMPersister) Delete(m models.Model) bool {
+func (gP GORMPersister) Delete(m models.Model) error {
 	gP.db.Delete(m, nil)
-	return true
+	return nil
 }

@@ -50,7 +50,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user variable
-	res, _ := uC.UserValidator.Validate(user)
+	res := uC.UserValidator.Validate(user)
 	if res == false {
 		uC.render.JSON(w, http.StatusBadRequest, nil)
 		return
@@ -94,7 +94,7 @@ func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user variable
-	res, _ := uC.UserValidator.Validate(user)
+	res := uC.UserValidator.Validate(user)
 	if res == false {
 		uC.render.JSON(w, http.StatusBadRequest, nil)
 		return

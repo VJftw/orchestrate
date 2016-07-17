@@ -14,8 +14,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
 	"github.com/smartystreets/goconvey/convey"
-	"github.com/vjftw/orchestrate/master/messages"
-	"github.com/vjftw/orchestrate/master/mocks"
+	"github.com/vjftw/orchestrate/master/mock"
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/routers"
 )
@@ -24,10 +23,10 @@ func TestUserController(t *testing.T) {
 
 	convey.Convey("Given a User Controller", t, func() {
 		ctrl := gomock.NewController(t)
-		modelManager := mocks.NewMockManager(ctrl)
-		userValidator := mocks.NewMockValidator(ctrl)
-		userProvider := mocks.NewMockIUserProvider(ctrl)
-		userResolver := mocks.NewMockIUserResolver(ctrl)
+		modelManager := mock.NewMockManager(ctrl)
+		userValidator := mock.NewMockValidator(ctrl)
+		userProvider := mock.NewMockIUserProvider(ctrl)
+		userResolver := mock.NewMockIUserResolver(ctrl)
 		defer ctrl.Finish()
 
 		userController := UserController{
@@ -51,7 +50,7 @@ func TestUserController(t *testing.T) {
 			user := models.User{}
 			userProvider.EXPECT().New().Times(1).Return(&user)
 			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
-			userValidator.EXPECT().Validate(&user).Times(1).Return(true, nil)
+			userValidator.EXPECT().Validate(&user).Times(1).Return(true)
 			modelManager.EXPECT().Save(&user).Times(1)
 
 			router.Handler.ServeHTTP(writer, request)
@@ -79,8 +78,7 @@ func TestUserController(t *testing.T) {
 			user := models.User{}
 			userProvider.EXPECT().New().Times(1).Return(&user)
 			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
-			vM := messages.ValidationMessage{}
-			userValidator.EXPECT().Validate(&user).Times(1).Return(false, &vM)
+			userValidator.EXPECT().Validate(&user).Times(1).Return(false)
 			modelManager.EXPECT().Save(&user).Times(0)
 
 			router.Handler.ServeHTTP(writer, request)
@@ -133,7 +131,7 @@ func TestUserController(t *testing.T) {
 			modelManager.EXPECT().GetInto(&user, "uuid = ?", "abcdef1234").Times(1).Return(nil)
 			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
 			user.Password = "barfoo4321"
-			userValidator.EXPECT().Validate(&user).Times(1).Return(true, nil)
+			userValidator.EXPECT().Validate(&user).Times(1).Return(true)
 			modelManager.EXPECT().Save(&user).Times(1)
 
 			router.Handler.ServeHTTP(writer, request)
@@ -281,8 +279,7 @@ func TestUserController(t *testing.T) {
 			userProvider.EXPECT().New().Times(1).Return(&user)
 			modelManager.EXPECT().GetInto(&user, "uuid = ?", "abcdef1234").Times(1).Return(nil)
 			userResolver.EXPECT().FromRequest(&user, request.Body).Times(1).Return(nil)
-			vM := messages.ValidationMessage{}
-			userValidator.EXPECT().Validate(&user).Times(1).Return(false, &vM)
+			userValidator.EXPECT().Validate(&user).Times(1).Return(false)
 			modelManager.EXPECT().Save(&user).Times(0)
 
 			router.Handler.ServeHTTP(writer, request)
