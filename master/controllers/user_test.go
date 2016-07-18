@@ -14,7 +14,10 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
 	"github.com/smartystreets/goconvey/convey"
-	"github.com/vjftw/orchestrate/master/mock"
+	"github.com/vjftw/orchestrate/master/mock/managers"
+	"github.com/vjftw/orchestrate/master/mock/providers"
+	"github.com/vjftw/orchestrate/master/mock/resolvers"
+	"github.com/vjftw/orchestrate/master/mock/validators"
 	"github.com/vjftw/orchestrate/master/models"
 	"github.com/vjftw/orchestrate/master/routers"
 )
@@ -23,10 +26,10 @@ func TestUser(t *testing.T) {
 
 	convey.Convey("Given a User Controller", t, func() {
 		ctrl := gomock.NewController(t)
-		modelManager := mock.NewMockManager(ctrl)
-		userValidator := mock.NewMockValidator(ctrl)
-		userProvider := mock.NewMockIUserProvider(ctrl)
-		userResolver := mock.NewMockIUserResolver(ctrl)
+		modelManager := managers.NewMockIManager(ctrl)
+		userValidator := validators.NewMockIValidator(ctrl)
+		userProvider := providers.NewMockIUser(ctrl)
+		userResolver := resolvers.NewMockIUser(ctrl)
 		defer ctrl.Finish()
 
 		userController := User{

@@ -6,14 +6,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/smartystreets/goconvey/convey"
-	"github.com/vjftw/orchestrate/master/mock"
+	"github.com/vjftw/orchestrate/master/mock/persisters"
 	"github.com/vjftw/orchestrate/master/models"
 )
 
 func TestModel(t *testing.T) {
 	convey.Convey("Given a Model Manager", t, func() {
 		ctrl := gomock.NewController(t)
-		persister := mock.NewMockPersister(ctrl)
+		persister := persisters.NewMockIPersister(ctrl)
 
 		modelManager := Model{
 			GORMPersister: persister,
