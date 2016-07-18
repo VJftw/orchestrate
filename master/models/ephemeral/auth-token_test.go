@@ -6,9 +6,9 @@ import (
 	"github.com/smartystreets/goconvey/convey"
 )
 
-func TestAuthEphmeral(t *testing.T) {
+func TestAuthToken(t *testing.T) {
 	convey.Convey("Given an ephemeral auth token", t, func() {
-		authToken := AuthEphemeral{
+		authToken := AuthToken{
 			Token: "abcdef1234",
 		}
 

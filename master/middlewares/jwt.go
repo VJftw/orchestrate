@@ -11,18 +11,18 @@ import (
 	"github.com/unrolled/render"
 )
 
-type JWTMiddleware struct {
+type JWT struct {
 	render *render.Render
 }
 
-func NewJWTMiddleware(renderer *render.Render) *JWTMiddleware {
-	return &JWTMiddleware{
+func NewJWT(renderer *render.Render) *JWT {
+	return &JWT{
 		render: renderer,
 	}
 }
 
-// JWTMiddleware -
-func (m *JWTMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// JWT -
+func (m *JWT) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	tokenString, err := fromAuthHeader(r)
 	if err != nil {
 		m.render.JSON(rw, http.StatusUnauthorized, nil)

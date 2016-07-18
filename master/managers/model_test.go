@@ -10,12 +10,12 @@ import (
 	"github.com/vjftw/orchestrate/master/models"
 )
 
-func TestModelManager(t *testing.T) {
+func TestModel(t *testing.T) {
 	convey.Convey("Given a Model Manager", t, func() {
 		ctrl := gomock.NewController(t)
 		persister := mock.NewMockPersister(ctrl)
 
-		modelManager := ModelManager{
+		modelManager := Model{
 			GORMPersister: persister,
 		}
 

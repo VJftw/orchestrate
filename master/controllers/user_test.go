@@ -19,7 +19,7 @@ import (
 	"github.com/vjftw/orchestrate/master/routers"
 )
 
-func TestUserController(t *testing.T) {
+func TestUser(t *testing.T) {
 
 	convey.Convey("Given a User Controller", t, func() {
 		ctrl := gomock.NewController(t)
@@ -29,7 +29,7 @@ func TestUserController(t *testing.T) {
 		userResolver := mock.NewMockIUserResolver(ctrl)
 		defer ctrl.Finish()
 
-		userController := UserController{
+		userController := User{
 			ModelManager:  modelManager,
 			UserValidator: userValidator,
 			UserProvider:  userProvider,

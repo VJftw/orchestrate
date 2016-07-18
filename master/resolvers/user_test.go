@@ -10,9 +10,9 @@ import (
 	"github.com/vjftw/orchestrate/master/models"
 )
 
-func TestUserResolver(t *testing.T) {
+func TestUser(t *testing.T) {
 	convey.Convey("Given a User Resolver", t, func() {
-		userResolver := UserResolver{}
+		userResolver := User{}
 
 		convey.Convey("When the JSON is valid", func() {
 

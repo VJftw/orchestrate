@@ -5,7 +5,7 @@ import (
 	"github.com/unrolled/render"
 )
 
-// Controller - Interface that defines methods that all controllers should have
-type Controller interface {
+// IController - Interface that defines methods that all controllers should have
+type IController interface {
 	Setup(*mux.Router, *render.Render)
 }

@@ -4,17 +4,19 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
+	// SQLite
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/vjftw/orchestrate/master/models"
 )
 
-// GORMPersister - Persistence using the GORM library
-type GORMPersister struct {
+// GORM - Persistence using the GORM library
+type GORM struct {
 	db *gorm.DB
 }
 
-func NewGORMPersister() *GORMPersister {
-	gormPersister := GORMPersister{}
+// NewGORM - Initialises a connection to a GORM storage
+func NewGORM() *GORM {
+	gormPersister := GORM{}
 
 	db, err := gorm.Open("sqlite3", "test.db")
 
@@ -31,13 +33,14 @@ func NewGORMPersister() *GORMPersister {
 }
 
 // Save - saves an object using GORM
-func (gP GORMPersister) Save(v models.Model) error {
+func (gP GORM) Save(v models.IModel) error {
 	gP.db.Save(v)
 	return nil
 }
 
-func (gP GORMPersister) GetInto(
-	v models.Model,
+// GetInto - Searches the Storage and places the result into a given Model based on the given query
+func (gP GORM) GetInto(
+	v models.IModel,
 	query interface{},
 	args ...interface{},
 ) error {
@@ -45,7 +48,8 @@ func (gP GORMPersister) GetInto(
 	return nil
 }
 
-func (gP GORMPersister) Delete(m models.Model) error {
+// Delete - Deletes a given model from the storage
+func (gP GORM) Delete(m models.IModel) error {
 	gP.db.Delete(m, nil)
 	return nil
 }

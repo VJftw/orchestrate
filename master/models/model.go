@@ -1,11 +1,11 @@
 package models
 
-// Model -
-type Model interface {
+// IModel -
+type IModel interface {
 	GetUUID() string
 }
 
-// Serializable -
-type Serializable interface {
+// ISerializable -
+type ISerializable interface {
 	ToMap() map[string]interface{}
 }

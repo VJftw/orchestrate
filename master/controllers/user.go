@@ -15,17 +15,17 @@ import (
 	"github.com/vjftw/orchestrate/master/validators"
 )
 
-// UserController - Handles actions that can be performed on Users
-type UserController struct {
+// User - Handles actions that can be performed on Users
+type User struct {
 	render        *render.Render
-	ModelManager  managers.Manager        `inject:"manager.default"`
-	UserValidator validators.Validator    `inject:"validator.user"`
-	UserProvider  providers.IUserProvider `inject:"provider.user"`
-	UserResolver  resolvers.IUserResolver `inject:"resolver.user"`
+	ModelManager  managers.IManager     `inject:"manager.default"`
+	UserValidator validators.IValidator `inject:"validator.user"`
+	UserProvider  providers.IUser       `inject:"provider.user"`
+	UserResolver  resolvers.IUser       `inject:"resolver.user"`
 }
 
-// Setup - Sets up the controller
-func (uC *UserController) Setup(router *mux.Router, renderer *render.Render) {
+// Setup - Sets up the
+func (uC *User) Setup(router *mux.Router, renderer *render.Render) {
 	uC.render = renderer
 
 	router.
@@ -33,13 +33,13 @@ func (uC *UserController) Setup(router *mux.Router, renderer *render.Render) {
 		Methods("POST")
 
 	router.Handle("/v1/users/{id}", negroni.New(
-		middlewares.NewJWTMiddleware(renderer),
+		middlewares.NewJWT(renderer),
 		negroni.Wrap(http.HandlerFunc(uC.putHandlerSec)),
 	)).Methods("PUT")
 
 }
 
-func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
+func (uC User) postHandler(w http.ResponseWriter, r *http.Request) {
 	user := uC.UserProvider.New()
 
 	// Unmarshal request into user variable
@@ -67,7 +67,7 @@ func (uC UserController) postHandler(w http.ResponseWriter, r *http.Request) {
 	uC.render.JSON(w, http.StatusCreated, user.ToMap())
 }
 
-func (uC UserController) putHandlerSec(w http.ResponseWriter, r *http.Request) {
+func (uC User) putHandlerSec(w http.ResponseWriter, r *http.Request) {
 	userUUID := mux.Vars(r)["id"]
 	authenticatedUserUUID := context.Get(r, "userUUID")
 

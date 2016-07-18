@@ -5,12 +5,12 @@ Future:
 package ephemeral
 
 // AuthEphemeral - An authentication token
-type AuthEphemeral struct {
+type AuthToken struct {
 	Token string
 }
 
 // ToMap - Returns a map representation of an authentication ephemeral
-func (aT AuthEphemeral) ToMap() map[string]interface{} {
+func (aT AuthToken) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"authToken": aT.Token,
 	}

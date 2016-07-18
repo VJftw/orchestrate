@@ -36,14 +36,14 @@ func NewOrchestrateApp() *OrchestrateApp {
 	// Logger: injectLogger{},
 	}
 
-	var userController controllers.UserController
+	var userController controllers.User
 
 	err := orchestrateApp.graph.Provide(
-		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORMPersister()},
-		&inject.Object{Name: "manager.default", Value: &managers.ModelManager{}},
-		&inject.Object{Name: "validator.user", Value: &validators.UserValidator{}},
-		&inject.Object{Name: "provider.user", Value: providers.NewUserProvider()},
-		&inject.Object{Name: "resolver.user", Value: &resolvers.UserResolver{}},
+		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORM()},
+		&inject.Object{Name: "manager.default", Value: &managers.Model{}},
+		&inject.Object{Name: "validator.user", Value: &validators.User{}},
+		&inject.Object{Name: "provider.user", Value: providers.NewUser()},
+		&inject.Object{Name: "resolver.user", Value: &resolvers.User{}},
 		&inject.Object{
 			Name:  "controller.user",
 			Value: &userController,

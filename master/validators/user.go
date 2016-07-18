@@ -2,10 +2,10 @@ package validators
 
 import "github.com/vjftw/orchestrate/master/models"
 
-type UserValidator struct {
+type User struct {
 }
 
 // Validate - Validates a User Model
-func (uV UserValidator) Validate(userModel models.Model) bool {
+func (uV User) Validate(userModel models.IModel) bool {
 	return true
 }

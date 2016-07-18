@@ -7,14 +7,14 @@ import (
 	"github.com/vjftw/orchestrate/master/models"
 )
 
-type IUserResolver interface {
+type IUser interface {
 	FromRequest(*models.User, io.ReadCloser) error
 }
 
-type UserResolver struct {
+type User struct {
 }
 
-func (uR UserResolver) FromRequest(u *models.User, b io.ReadCloser) error {
+func (uR User) FromRequest(u *models.User, b io.ReadCloser) error {
 
 	var rJSON map[string]interface{}
 
