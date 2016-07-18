@@ -43,6 +43,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&inject.Object{Name: "manager.default", Value: &managers.Model{}},
 		&inject.Object{Name: "validator.user", Value: &validators.User{}},
 		&inject.Object{Name: "provider.user", Value: providers.NewUser()},
+		&inject.Object{Name: "provider.auth_token", Value: providers.NewAuthToken()},
 		&inject.Object{Name: "resolver.user", Value: &resolvers.User{}},
 		&inject.Object{
 			Name:  "controller.user",

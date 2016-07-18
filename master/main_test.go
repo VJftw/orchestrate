@@ -12,12 +12,13 @@ func TestOrchestrateApp(t *testing.T) {
 
 		convey.Convey("All the services should be present", func() {
 			services := map[string]bool{
-				"persister.gorm":  false,
-				"manager.default": false,
-				"controller.user": false,
-				"validator.user":  false,
-				"provider.user":   false,
-				"resolver.user":   false,
+				"persister.gorm":      false,
+				"manager.default":     false,
+				"controller.user":     false,
+				"validator.user":      false,
+				"provider.user":       false,
+				"provider.auth_token": false,
+				"resolver.user":       false,
 			}
 
 			for _, element := range app.graph.Objects() {
