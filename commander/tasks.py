@@ -23,18 +23,18 @@ def test(ctx):
         tag="{0}-dev".format(flow.get_branch_container_name()),
         command='glide install',
         volumes=[
-            "{0}:/go/src/github.com/vjftw/orchestrate/master".format(os.getcwd())
+            "{0}:/go/src/github.com/vjftw/orchestrate/commander".format(os.getcwd())
         ],
-        working_dir="/go/src/github.com/vjftw/orchestrate/master",
+        working_dir="/go/src/github.com/vjftw/orchestrate/commander",
         environment={}
     )
     Docker.run(cli,
         tag="{0}-dev".format(flow.get_branch_container_name()),
         command='/bin/sh -c "go test -v -cover $(glide novendor)"',
         volumes=[
-            "{0}:/go/src/github.com/vjftw/orchestrate/master".format(os.getcwd())
+            "{0}:/go/src/github.com/vjftw/orchestrate/commander".format(os.getcwd())
         ],
-        working_dir="/go/src/github.com/vjftw/orchestrate/master",
+        working_dir="/go/src/github.com/vjftw/orchestrate/commander",
         environment={
             "TERM": "xterm-color"
         }

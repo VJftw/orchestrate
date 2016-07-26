@@ -46,13 +46,13 @@ func TestModel(t *testing.T) {
 			args := "foo@bar.com"
 
 			convey.Convey("Then it gets successfully", func() {
-				persister.EXPECT().GetInto(&model, query, []interface{}{args}).Times(1).Return(nil)
+				persister.EXPECT().GetInto(&model, query, args).Times(1).Return(nil)
 				res := modelManager.GetInto(&model, query, args)
 				convey.So(res, convey.ShouldBeNil)
 			})
 
 			convey.Convey("Or it gets unsuccessfully", func() {
-				persister.EXPECT().GetInto(&model, query, []interface{}{args}).Times(1).Return(errors.New("Not Found"))
+				persister.EXPECT().GetInto(&model, query, args).Times(1).Return(errors.New("Not Found"))
 				res := modelManager.GetInto(&model, query, args)
 				convey.So(res, convey.ShouldNotBeNil)
 			})
