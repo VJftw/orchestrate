@@ -8,7 +8,7 @@ import (
 )
 
 func TestUserProvider(t *testing.T) {
-	convey.Convey("Given a User Provier", t, func() {
+	convey.Convey("Given a User Provider", t, func() {
 		userProvider := NewUser()
 
 		convey.Convey("When I call New()", func() {
