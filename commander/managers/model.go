@@ -10,6 +10,10 @@ type Model struct {
 	GORMPersister persisters.IPersister `inject:"persister.gorm"`
 }
 
+func NewModel() *Model {
+	return &Model{}
+}
+
 // Save - Saves the model across storages
 func (mM Model) Save(m models.IModel) error {
 	mM.GORMPersister.Save(m)
@@ -22,7 +26,7 @@ func (mM Model) GetInto(m models.IModel, query interface{}, args ...interface{})
 	// check cache
 
 	// check database
-	err := mM.GORMPersister.GetInto(m, query, args)
+	err := mM.GORMPersister.GetInto(m, query, args...)
 	if err != nil {
 		return err
 	}

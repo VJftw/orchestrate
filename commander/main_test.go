@@ -15,10 +15,15 @@ func TestOrchestrateApp(t *testing.T) {
 				"persister.gorm":      false,
 				"manager.default":     false,
 				"controller.user":     false,
+				"controller.auth":     false,
+				"controller.project":  false,
 				"validator.user":      false,
+				"validator.project":   false,
 				"provider.user":       false,
 				"provider.auth_token": false,
+				"provider.project":    false,
 				"resolver.user":       false,
+				"resolver.project":    false,
 			}
 
 			for _, element := range app.graph.Objects() {

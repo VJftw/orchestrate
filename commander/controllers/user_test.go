@@ -27,7 +27,7 @@ func TestUser(t *testing.T) {
 	convey.Convey("Given a User Controller", t, func() {
 		ctrl := gomock.NewController(t)
 		modelManager := managers.NewMockIManager(ctrl)
-		userValidator := validators.NewMockIValidator(ctrl)
+		userValidator := validators.NewMockIUser(ctrl)
 		userProvider := providers.NewMockIUser(ctrl)
 		userResolver := resolvers.NewMockIUser(ctrl)
 		defer ctrl.Finish()

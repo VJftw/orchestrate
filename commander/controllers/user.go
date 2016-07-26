@@ -18,10 +18,10 @@ import (
 // User - Handles actions that can be performed on Users
 type User struct {
 	render        *render.Render
-	ModelManager  managers.IManager     `inject:"manager.default"`
-	UserValidator validators.IValidator `inject:"validator.user"`
-	UserProvider  providers.IUser       `inject:"provider.user"`
-	UserResolver  resolvers.IUser       `inject:"resolver.user"`
+	ModelManager  managers.IManager `inject:"manager.default"`
+	UserValidator validators.IUser  `inject:"validator.user"`
+	UserProvider  providers.IUser   `inject:"provider.user"`
+	UserResolver  resolvers.IUser   `inject:"resolver.user"`
 }
 
 // Setup - Sets up the

@@ -25,7 +25,7 @@ func NewGORM() *GORM {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Project{})
 
 	gormPersister.db = db
 
@@ -44,7 +44,7 @@ func (gP GORM) GetInto(
 	query interface{},
 	args ...interface{},
 ) error {
-	gP.db.Where(query, args).First(v)
+	gP.db.Where(query, args...).First(v)
 	return nil
 }
 

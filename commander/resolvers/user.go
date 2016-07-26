@@ -14,6 +14,10 @@ type IUser interface {
 type User struct {
 }
 
+func NewUser() *User {
+	return &User{}
+}
+
 func (uR User) FromRequest(u *models.User, b io.ReadCloser) error {
 
 	var rJSON map[string]interface{}

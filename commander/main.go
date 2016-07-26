@@ -37,17 +37,30 @@ func NewOrchestrateApp() *OrchestrateApp {
 	}
 
 	var userController controllers.User
+	var authController controllers.Auth
+	var projectController controllers.Project
 
 	err := orchestrateApp.graph.Provide(
 		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORM()},
-		&inject.Object{Name: "manager.default", Value: &managers.Model{}},
-		&inject.Object{Name: "validator.user", Value: &validators.User{}},
+		&inject.Object{Name: "manager.default", Value: managers.NewModel()},
+		&inject.Object{Name: "validator.user", Value: validators.NewUser()},
+		&inject.Object{Name: "validator.project", Value: validators.NewProject()},
 		&inject.Object{Name: "provider.user", Value: providers.NewUser()},
+		&inject.Object{Name: "provider.project", Value: providers.NewProject()},
 		&inject.Object{Name: "provider.auth_token", Value: providers.NewAuthToken()},
-		&inject.Object{Name: "resolver.user", Value: &resolvers.User{}},
+		&inject.Object{Name: "resolver.user", Value: resolvers.NewUser()},
+		&inject.Object{Name: "resolver.project", Value: resolvers.NewProject()},
 		&inject.Object{
 			Name:  "controller.user",
 			Value: &userController,
+		},
+		&inject.Object{
+			Name:  "controller.auth",
+			Value: &authController,
+		},
+		&inject.Object{
+			Name:  "controller.project",
+			Value: &projectController,
 		},
 	)
 
@@ -66,6 +79,8 @@ func NewOrchestrateApp() *OrchestrateApp {
 
 	muxRouter := routers.NewMuxRouter([]routers.Routable{
 		&userController,
+		&authController,
+		&projectController,
 	}, true)
 
 	orchestrateApp.Router = muxRouter

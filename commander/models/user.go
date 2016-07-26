@@ -11,7 +11,7 @@ type User struct {
 	UUID         string `json:"uuid" gorm:"unique"`
 	EmailAddress string `json:"emailAddress" gorm:"not null;unique;index" valid:"email,required"`
 	Password     string `json:"password" gorm:"-" valid:"length(6|255),required"`
-	PasswordHash []byte `gorm:"non null"`
+	PasswordHash []byte `gorm:"not null"`
 	FirstName    string `json:"firstName" valid:"alpha"`
 	LastName     string `json:"lastName" valid:"alpha"`
 }
