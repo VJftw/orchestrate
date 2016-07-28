@@ -23,11 +23,13 @@ import:
   - bcrypt
 - package: github.com/satori/go.uuid
   version: ^1.1.0
-- package: github.com/golang/mock
-  subpackages:
-  - gomock
 testImport:
 - package: github.com/smartystreets/goconvey
   version: ^1.6.2
   subpackages:
   - convey
+- package: github.com/golang/mock
+  subpackages:
+  - gomock
+- package: github.com/stretchr/testify
+  version: ^1.1.3

@@ -9,7 +9,7 @@ cli = Client(base_url='unix://var/run/docker.sock', timeout=600)
 
 flow = Flow(
     repository="vjftw/orchestrate",
-    prefix="master"
+    prefix="commander"
 )
 
 @task

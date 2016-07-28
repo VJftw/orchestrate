@@ -1,0 +1,312 @@
+package user_test
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/smartystreets/goconvey/convey"
+	"github.com/vjftw/orchestrate/commander/domain/user"
+	"github.com/vjftw/orchestrate/commander/domain/user/mocks"
+	"github.com/vjftw/orchestrate/commander/routers"
+)
+
+func TestController(t *testing.T) {
+
+	convey.Convey("Given a User Controller", t, func() {
+		userManager := &mocks.Manager{}
+		userProvider := &mocks.Provider{}
+		userResolver := &mocks.Resolver{}
+		userValidator := &mocks.Validator{}
+
+		userController := user.Controller{
+			UserManager:   userManager,
+			UserProvider:  userProvider,
+			UserResolver:  userResolver,
+			UserValidator: userValidator,
+		}
+
+		router := routers.NewMuxRouter([]routers.Routable{&userController}, false)
+
+		convey.Convey("When I send a valid POST request to /v1/users", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "foo@bar.com",
+				"password":     "foobar1234",
+			})
+
+			request, _ := http.NewRequest("POST", "/v1/users", ioutil.NopCloser(bytes.NewReader(b)))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
+			userValidator.On("Validate", &user).Return(true).Once()
+			userManager.On("Save", &user).Return(nil).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 201 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 201)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				var jsonResp map[string]string
+				json.Unmarshal(writer.Body.Bytes(), &jsonResp)
+
+				convey.So(jsonResp["uuid"], convey.ShouldNotBeEmpty)
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send an invalid POST request to /v1/users", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "iamnotanemail",
+				"password":     "a",
+			})
+
+			request, _ := http.NewRequest("POST", "/v1/users", ioutil.NopCloser(bytes.NewReader(b)))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
+			userValidator.On("Validate", &user).Return(false).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 400 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 400)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send a malformed POST request to /v1/users", func() {
+			b := []byte("malformedJSON")
+
+			request, _ := http.NewRequest("POST", "/v1/users", ioutil.NopCloser(bytes.NewReader(b)))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(errors.New("Malformed request")).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 400 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 400)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send an authenticated valid PUT request to /v1/users/{id}", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "bar@foo.com",
+				"password":     "barfoo4321",
+				"firstName":    "bar",
+				"lastName":     "foo",
+			})
+
+			request, _ := http.NewRequest("PUT", "/v1/users/abcdef1234", ioutil.NopCloser(bytes.NewReader(b)))
+			jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"userUUID": string("abcdef1234"),
+				"nbf":      time.Now().Unix(),
+			})
+			jwtTokenStr, _ := jwtToken.SignedString([]byte("hmacSecret"))
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
+			user.Password = "barfoo4321"
+			userValidator.On("Validate", &user).Return(true).Once()
+			userManager.On("Save", &user).Return(nil).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 200 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 200)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send an unauthenticated PUT request to /v1/users/{id}", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "bar@foo.com",
+				"password":     "barfoo4321",
+				"firstName":    "bar",
+				"lastName":     "foo",
+			})
+
+			request, _ := http.NewRequest("PUT", "/v1/users/abcdef1234", ioutil.NopCloser(bytes.NewReader(b)))
+			writer := httptest.NewRecorder()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 401 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 401)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send an authenticated valid PUT request to /v1/users/{id} for a different user id", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "bar@foo.com",
+				"password":     "barfoo4321",
+				"firstName":    "bar",
+				"lastName":     "foo",
+			})
+
+			request, _ := http.NewRequest("PUT", "/v1/users/anotherUser", ioutil.NopCloser(bytes.NewReader(b)))
+			jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"userUUID": string("abcdef1234"),
+				"nbf":      time.Now().Unix(),
+			})
+			jwtTokenStr, _ := jwtToken.SignedString([]byte("hmacSecret"))
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
+			writer := httptest.NewRecorder()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 403 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 403)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send a PUT request to /v1/users/{id} where the user does not exist", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "bar@foo.com",
+				"password":     "barfoo4321",
+				"firstName":    "bar",
+				"lastName":     "foo",
+			})
+
+			request, _ := http.NewRequest("PUT", "/v1/users/missing", ioutil.NopCloser(bytes.NewReader(b)))
+			jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"userUUID": string("missing"),
+				"nbf":      time.Now().Unix(),
+			})
+			jwtTokenStr, _ := jwtToken.SignedString([]byte("hmacSecret"))
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"missing"}).Return(errors.New("User not found.")).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 404 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 404)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send a malformed PUT request to /v1/users/{id}", func() {
+			b := []byte("malformedJSON")
+
+			request, _ := http.NewRequest("PUT", "/v1/users/abcdef1234", ioutil.NopCloser(bytes.NewReader(b)))
+			jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"userUUID": string("abcdef1234"),
+				"nbf":      time.Now().Unix(),
+			})
+			jwtTokenStr, _ := jwtToken.SignedString([]byte("hmacSecret"))
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(errors.New("Malformed JSON")).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 400 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 400)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+		convey.Convey("When I send an invalid PUT request to /v1/users/{id}", func() {
+			b, _ := json.Marshal(map[string]string{
+				"emailAddress": "bar",
+				"password":     "b",
+				"firstName":    "bar",
+				"lastName":     "foo",
+			})
+			request, _ := http.NewRequest("PUT", "/v1/users/abcdef1234", ioutil.NopCloser(bytes.NewReader(b)))
+			jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"userUUID": string("abcdef1234"),
+				"nbf":      time.Now().Unix(),
+			})
+			jwtTokenStr, _ := jwtToken.SignedString([]byte("hmacSecret"))
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
+			writer := httptest.NewRecorder()
+
+			user := user.User{}
+			userProvider.On("New").Return(&user).Once()
+			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
+			userValidator.On("Validate", &user).Return(false).Once()
+
+			router.Handler.ServeHTTP(writer, request)
+
+			convey.Convey("Then it should give the correct 400 response", func() {
+				convey.So(writer.Code, convey.ShouldEqual, 400)
+				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
+
+				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
+				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
+			})
+		})
+
+	})
+}

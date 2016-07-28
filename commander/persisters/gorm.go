@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	// SQLite
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/vjftw/orchestrate/commander/models"
 )
 
 // GORM - Persistence using the GORM library
@@ -15,7 +14,7 @@ type GORM struct {
 }
 
 // NewGORM - Initialises a connection to a GORM storage
-func NewGORM() *GORM {
+func NewGORM(models ...interface{}) *GORM {
 	gormPersister := GORM{}
 
 	db, err := gorm.Open("sqlite3", "test.db")
@@ -25,7 +24,7 @@ func NewGORM() *GORM {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&models.User{}, &models.Project{})
+	db.AutoMigrate(models...)
 
 	gormPersister.db = db
 
@@ -33,14 +32,14 @@ func NewGORM() *GORM {
 }
 
 // Save - saves an object using GORM
-func (gP GORM) Save(v models.IModel) error {
+func (gP GORM) Save(v Persistable) error {
 	gP.db.Save(v)
 	return nil
 }
 
 // GetInto - Searches the Storage and places the result into a given Model based on the given query
 func (gP GORM) GetInto(
-	v models.IModel,
+	v Persistable,
 	query interface{},
 	args ...interface{},
 ) error {
@@ -49,7 +48,7 @@ func (gP GORM) GetInto(
 }
 
 // Delete - Deletes a given model from the storage
-func (gP GORM) Delete(m models.IModel) error {
+func (gP GORM) Delete(m Persistable) error {
 	gP.db.Delete(m, nil)
 	return nil
 }

@@ -7,13 +7,11 @@ import (
 	"os"
 
 	"github.com/facebookgo/inject"
-	"github.com/vjftw/orchestrate/commander/controllers"
-	"github.com/vjftw/orchestrate/commander/managers"
+	"github.com/vjftw/orchestrate/commander/domain/auth"
+	"github.com/vjftw/orchestrate/commander/domain/project"
+	"github.com/vjftw/orchestrate/commander/domain/user"
 	"github.com/vjftw/orchestrate/commander/persisters"
-	"github.com/vjftw/orchestrate/commander/providers"
-	"github.com/vjftw/orchestrate/commander/resolvers"
 	"github.com/vjftw/orchestrate/commander/routers"
-	"github.com/vjftw/orchestrate/commander/validators"
 )
 
 // OrchestrateApp - Orchestrate application struct
@@ -26,40 +24,43 @@ type injectLogger struct {
 }
 
 func (l injectLogger) Debugf(format string, v ...interface{}) {
-	fmt.Println(fmt.Sprintf(format, v))
+	// fmt.Println(fmt.Sprintf(format, v))
 }
 
 // NewOrchestrateApp - Initialise with Depencency Injection
 func NewOrchestrateApp() *OrchestrateApp {
 	orchestrateApp := OrchestrateApp{}
 	orchestrateApp.graph = &inject.Graph{
-	// Logger: injectLogger{},
+		Logger: injectLogger{},
 	}
 
-	var userController controllers.User
-	var authController controllers.Auth
-	var projectController controllers.Project
+	var userController user.Controller
+	var authController auth.Controller
+	var projectController project.Controller
+
+	gormPersister := persisters.NewGORM(&user.User{}, &project.Project{})
 
 	err := orchestrateApp.graph.Provide(
-		&inject.Object{Name: "persister.gorm", Value: persisters.NewGORM()},
-		&inject.Object{Name: "manager.default", Value: managers.NewModel()},
-		&inject.Object{Name: "validator.user", Value: validators.NewUser()},
-		&inject.Object{Name: "validator.project", Value: validators.NewProject()},
-		&inject.Object{Name: "provider.user", Value: providers.NewUser()},
-		&inject.Object{Name: "provider.project", Value: providers.NewProject()},
-		&inject.Object{Name: "provider.auth_token", Value: providers.NewAuthToken()},
-		&inject.Object{Name: "resolver.user", Value: resolvers.NewUser()},
-		&inject.Object{Name: "resolver.project", Value: resolvers.NewProject()},
+		&inject.Object{Name: "persister.gorm", Value: gormPersister},
+		&inject.Object{Name: "user.manager", Value: user.NewManager()},
+		&inject.Object{Name: "user.validator", Value: user.NewValidator()},
+		&inject.Object{Name: "user.provider", Value: user.NewProvider()},
+		&inject.Object{Name: "user.resolver", Value: user.NewResolver()},
+		&inject.Object{Name: "auth.provider", Value: auth.NewProvider()},
+		&inject.Object{Name: "project.manager", Value: project.NewManager()},
+		&inject.Object{Name: "project.provider", Value: project.NewProvider()},
+		&inject.Object{Name: "project.resolver", Value: project.NewResolver()},
+		&inject.Object{Name: "project.validator", Value: project.NewValidator()},
 		&inject.Object{
-			Name:  "controller.user",
+			Name:  "user.controller",
 			Value: &userController,
 		},
 		&inject.Object{
-			Name:  "controller.auth",
+			Name:  "auth.controller",
 			Value: &authController,
 		},
 		&inject.Object{
-			Name:  "controller.project",
+			Name:  "project.controller",
 			Value: &projectController,
 		},
 	)
