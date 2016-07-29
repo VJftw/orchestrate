@@ -1,10 +1,10 @@
-hash: 01850fb500d32171e435e8c0885ce338b70ce74dbf33352ba0ff729fc2f83b90
-updated: 2016-07-28T18:59:08.55518736+01:00
+hash: 1c4aefdc2e2d56012477985d28763bc2c8d93b4b497b20ba481ee161513225ea
+updated: 2016-07-29T16:54:33.693379365+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
 - name: github.com/davecgh/go-spew
-  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
+  version: 2df174808ee097f90d259e432cc04442cf60be21
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
@@ -13,10 +13,6 @@ imports:
   version: 643b7206b487b04fbea325cf6e8d06a66f8db772
 - name: github.com/facebookgo/structtag
   version: 217e25fb96916cc60332e399c9aa63f5c422ceed
-- name: github.com/golang/mock
-  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
-  subpackages:
-  - gomock
 - name: github.com/gorilla/context
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux
@@ -24,11 +20,14 @@ imports:
 - name: github.com/jinzhu/gorm
   version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
   subpackages:
-  - dialects/sqlite
+  - dialects/postgres
 - name: github.com/jinzhu/inflection
   version: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
-- name: github.com/mattn/go-sqlite3
-  version: e118d4451349065b8e7ce0f0af32e033995363f8
+- name: github.com/lib/pq
+  version: 4dd446efc17690bc53e154025146f73203b18309
+  subpackages:
+  - hstore
+  - oid
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
@@ -54,6 +53,10 @@ imports:
   - bcrypt
   - blowfish
 testImports:
+- name: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
+  subpackages:
+  - gomock
 - name: github.com/gopherjs/gopherjs
   version: 090403452ab6979e3b7c054ceb7ee23da91b2ae4
   subpackages:
@@ -71,3 +74,5 @@ testImports:
   - convey
   - convey/reporting
   - convey/gotest
+- name: github.com/stretchr/testify
+  version: f390dcf405f7b83c997eac1b06768bb9f44dec18

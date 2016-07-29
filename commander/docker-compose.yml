@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+    db:
+        image: postgres:latest
+        environment:
+            POSTGRES_PASSWORD: orchestrate
+            POSTGRES_USER: orchestrate
+            POSTGRES_DB: orchestrate
+
+    commander:
+        depends_on:
+            - db
+        build:
+            context: .
+            dockerfile: Dockerfile.app
+        links:
+            - db
+        ports:
+            - "80:80"
+        environment:
+            DB_HOST: db
+            DB_USER: orchestrate
+            DB_NAME: orchestrate
+            DB_PASSWORD: orchestrate
+            HTTP_PORT: 80

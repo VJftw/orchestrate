@@ -97,5 +97,6 @@ func AppEngine() {
 
 func main() {
 	app := NewOrchestrateApp()
-	log.Fatal(http.ListenAndServe(":8734", app.Router.Handler))
+	port := os.Getenv("HTTP_PORT")
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), app.Router.Handler))
 }

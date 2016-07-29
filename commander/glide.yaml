@@ -12,7 +12,7 @@ import:
 - package: github.com/jinzhu/gorm
   version: ^1.0.0
   subpackages:
-  - dialects/sqlite
+  - dialects/postgres
 - package: github.com/speps/go-hashids
   version: ^1.0.0
 - package: github.com/unrolled/render
