@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/smartystreets/goconvey/convey"
@@ -29,6 +30,26 @@ func TestManager(t *testing.T) {
 			gormPersister.On("Delete", &user).Return(nil).Once()
 
 			convey.So(userManager.Delete(&user), convey.ShouldBeNil)
+
+			convey.So(gormPersister.AssertExpectations(t), convey.ShouldBeTrue)
+		})
+
+		convey.Convey("It should get a User into an object if it exists", func() {
+			user := user.User{}
+
+			gormPersister.On("GetInto", &user, "email_address = ?", []interface{}{"foo@bar.com"}).Return(nil).Once()
+
+			convey.So(userManager.GetInto(&user, "email_address = ?", "foo@bar.com"), convey.ShouldBeNil)
+			convey.So(gormPersister.AssertExpectations(t), convey.ShouldBeTrue)
+		})
+
+		convey.Convey("It should return errors if necessary", func() {
+			user := user.User{}
+
+			gormPersister.On("GetInto", &user, "email_address = ?", []interface{}{"foo@bar.com"}).Return(errors.New("invalid column")).Once()
+
+			err := userManager.GetInto(&user, "email_address = ?", "foo@bar.com")
+			convey.So(err, convey.ShouldNotBeNil)
 
 			convey.So(gormPersister.AssertExpectations(t), convey.ShouldBeTrue)
 		})
