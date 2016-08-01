@@ -8,6 +8,7 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/vjftw/orchestrate/commander/domain/auth"
+	"github.com/vjftw/orchestrate/commander/domain/cadetGroup"
 	"github.com/vjftw/orchestrate/commander/domain/project"
 	"github.com/vjftw/orchestrate/commander/domain/user"
 	"github.com/vjftw/orchestrate/commander/persisters"
@@ -16,7 +17,7 @@ import (
 
 // OrchestrateApp - Orchestrate application struct
 type OrchestrateApp struct {
-	graph  *inject.Graph
+	Graph  *inject.Graph
 	Router *routers.MuxRouter
 }
 
@@ -30,27 +31,31 @@ func (l injectLogger) Debugf(format string, v ...interface{}) {
 // NewOrchestrateApp - Initialise with Depencency Injection
 func NewOrchestrateApp() *OrchestrateApp {
 	orchestrateApp := OrchestrateApp{}
-	orchestrateApp.graph = &inject.Graph{
+	orchestrateApp.Graph = &inject.Graph{
 		Logger: injectLogger{},
 	}
 
 	var userController user.Controller
 	var authController auth.Controller
 	var projectController project.Controller
+	var cadetGroupController cadetGroup.Controller
 
-	gormPersister := persisters.NewGORM(&user.User{}, &project.Project{})
+	// Initialise persisters to pass into managers
+	gormDB := persisters.NewGORMDB(&user.User{}, &project.Project{}, &cadetGroup.CadetGroup{})
 
-	err := orchestrateApp.graph.Provide(
-		&inject.Object{Name: "persister.gorm", Value: gormPersister},
-		&inject.Object{Name: "user.manager", Value: user.NewManager()},
+	err := orchestrateApp.Graph.Provide(
+		&inject.Object{Name: "user.manager", Value: user.NewManager(gormDB)},
 		&inject.Object{Name: "user.validator", Value: user.NewValidator()},
 		&inject.Object{Name: "user.provider", Value: user.NewProvider()},
 		&inject.Object{Name: "user.resolver", Value: user.NewResolver()},
 		&inject.Object{Name: "auth.provider", Value: auth.NewProvider()},
-		&inject.Object{Name: "project.manager", Value: project.NewManager()},
-		&inject.Object{Name: "project.provider", Value: project.NewProvider()},
+		&inject.Object{Name: "project.manager", Value: project.NewManager(gormDB)},
 		&inject.Object{Name: "project.resolver", Value: project.NewResolver()},
 		&inject.Object{Name: "project.validator", Value: project.NewValidator()},
+		&inject.Object{Name: "cadetGroup.manager", Value: cadetGroup.NewManager(gormDB)},
+		&inject.Object{Name: "cadetGroup.resolver", Value: cadetGroup.NewResolver()},
+		&inject.Object{Name: "cadetGroup.validator", Value: cadetGroup.NewValidator()},
+
 		&inject.Object{
 			Name:  "user.controller",
 			Value: &userController,
@@ -63,6 +68,10 @@ func NewOrchestrateApp() *OrchestrateApp {
 			Name:  "project.controller",
 			Value: &projectController,
 		},
+		&inject.Object{
+			Name:  "cadetGroup.controller",
+			Value: &cadetGroupController,
+		},
 	)
 
 	if err != nil {
@@ -70,7 +79,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		os.Exit(1)
 	}
 
-	if err := orchestrateApp.graph.Populate(); err != nil {
+	if err := orchestrateApp.Graph.Populate(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -82,6 +91,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&userController,
 		&authController,
 		&projectController,
+		&cadetGroupController,
 	}, true)
 
 	orchestrateApp.Router = muxRouter

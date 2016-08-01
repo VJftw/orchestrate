@@ -1,8 +1,9 @@
-package main
+package main_test
 
 // func TestOrchestrateApp(t *testing.T) {
+//
 // 	convey.Convey("Given an Orchestrate App", t, func() {
-// 		app := NewOrchestrateApp()
+// 		app := main.NewOrchestrateApp()
 //
 // 		convey.Convey("All the services should be present", func() {
 // 			services := map[string]bool{
@@ -21,7 +22,7 @@ package main
 // 				"project.controller": false,
 // 			}
 //
-// 			for _, element := range app.graph.Objects() {
+// 			for _, element := range app.Graph.Objects() {
 // 				for serviceName := range services {
 // 					if element.Name == serviceName {
 // 						services[serviceName] = true

@@ -1,19 +1,22 @@
 package user
 
 import (
-	"github.com/jinzhu/gorm"
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 // User - A user of the application
 type User struct {
-	gorm.Model
-	UUID         string `json:"uuid" gorm:"unique"`
-	EmailAddress string `json:"emailAddress" gorm:"not null;unique;index" valid:"email,required"`
-	Password     string `json:"password" gorm:"-" valid:"length(6|255),required"`
-	PasswordHash []byte `gorm:"not null"`
-	FirstName    string `json:"firstName" valid:"alpha"`
-	LastName     string `json:"lastName" valid:"alpha"`
+	ID           uint      `gorm:"primary_key" json:"-"`
+	CreatedAt    time.Time `json:"-"`
+	UpdatedAt    time.Time `json:"-"`
+	UUID         string    `json:"uuid" gorm:"unique"`
+	EmailAddress string    `json:"emailAddress" gorm:"not null;unique;index" valid:"email,required"`
+	Password     string    `json:"-" gorm:"-" valid:"length(6|255),required"`
+	PasswordHash []byte    `json:"-" gorm:"not null"`
+	FirstName    string    `json:"firstName" valid:"alpha"`
+	LastName     string    `json:"lastName" valid:"alpha"`
 }
 
 // GetUUID - Return the UUID
@@ -32,14 +35,4 @@ func (u User) VerifyPassword() bool {
 		return true
 	}
 	return false
-}
-
-// ToMap - Returns a map representation of a User
-func (u User) ToMap() map[string]interface{} {
-	return map[string]interface{}{
-		"uuid":         u.UUID,
-		"emailAddress": u.EmailAddress,
-		"firstName":    u.FirstName,
-		"lastName":     u.LastName,
-	}
 }

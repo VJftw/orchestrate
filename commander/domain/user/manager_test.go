@@ -12,9 +12,7 @@ import (
 func TestManager(t *testing.T) {
 	convey.Convey("Given a Manager", t, func() {
 		gormPersister := &mocks.Persister{}
-		userManager := user.UserManager{
-			GORMPersister: gormPersister,
-		}
+		userManager := user.NewManager(gormPersister)
 
 		convey.Convey("It should Save a given User", func() {
 			user := user.User{}

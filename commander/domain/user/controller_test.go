@@ -56,7 +56,7 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 201)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				var jsonResp map[string]string
+				var jsonResp map[string]interface{}
 				json.Unmarshal(writer.Body.Bytes(), &jsonResp)
 
 				convey.So(jsonResp["uuid"], convey.ShouldNotBeEmpty)

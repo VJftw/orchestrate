@@ -16,13 +16,6 @@ func TestUser(t *testing.T) {
 			LastName:     "Bar",
 		}
 
-		convey.Convey("It should return a serializable map", func() {
-			convey.So(user.ToMap()["uuid"], convey.ShouldEqual, "6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-			convey.So(user.ToMap()["emailAddress"], convey.ShouldEqual, "foo@bar.com")
-			convey.So(user.ToMap()["firstName"], convey.ShouldEqual, "Foo")
-			convey.So(user.ToMap()["lastName"], convey.ShouldEqual, "Bar")
-		})
-
 		convey.Convey("It should return the UUID", func() {
 			convey.So(string(user.GetUUID()), convey.ShouldEqual, "6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 		})

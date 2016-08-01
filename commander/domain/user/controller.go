@@ -58,7 +58,7 @@ func (c Controller) postHandler(w http.ResponseWriter, r *http.Request) {
 	c.UserManager.Save(user)
 
 	// write the user variable to output and set http header to 201
-	c.render.JSON(w, http.StatusCreated, user.ToMap())
+	c.render.JSON(w, http.StatusCreated, user)
 }
 
 func (c Controller) securePutHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,9 +72,7 @@ func (c Controller) securePutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get User via userUUID
-	user := c.UserProvider.New()
-
-	err := c.UserManager.GetInto(user, "uuid = ?", userUUID)
+	user, err := c.UserManager.FindByUUID(userUUID)
 	if err != nil {
 		c.render.JSON(w, http.StatusNotFound, nil)
 		return
@@ -100,5 +98,5 @@ func (c Controller) securePutHandler(w http.ResponseWriter, r *http.Request) {
 
 	c.UserManager.Save(user)
 
-	c.render.JSON(w, http.StatusOK, user.ToMap())
+	c.render.JSON(w, http.StatusOK, user)
 }

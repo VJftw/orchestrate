@@ -1,0 +1,65 @@
+package cadetGroup
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/satori/go.uuid"
+	"github.com/unrolled/render"
+	"github.com/urfave/negroni"
+	"github.com/vjftw/orchestrate/commander/domain/project"
+	"github.com/vjftw/orchestrate/commander/domain/user"
+	"github.com/vjftw/orchestrate/commander/middlewares"
+)
+
+type Controller struct {
+	render              *render.Render
+	UserProvider        user.Provider   `inject:"user.provider"`
+	ProjectManager      project.Manager `inject:"project.manager"`
+	CadetGroupResolver  Resolver        `inject:"cadetGroup.resolver"`
+	CadetGroupValidator Validator       `inject:"cadetGroup.validator"`
+	CadetGroupManager   Manager         `inject:"cadetGroup.manager"`
+}
+
+func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
+	c.render = renderer
+
+	router.Handle("/v1/projects/{projectUUID}/cadetGroups", negroni.New(
+		middlewares.NewJWT(renderer),
+		negroni.Wrap(http.HandlerFunc(c.securedPostHandler)),
+	)).Methods("POST")
+}
+
+func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	if err != nil {
+		c.render.JSON(w, http.StatusUnauthorized, nil)
+		return
+	}
+
+	projectUUID := mux.Vars(r)["projectUUID"]
+	project, err := c.ProjectManager.FindByUserAndUUID(user, projectUUID)
+	if err != nil {
+		c.render.JSON(w, http.StatusForbidden, nil)
+		return
+	}
+
+	cadetGroup := c.CadetGroupManager.NewForProject(project)
+	err = c.CadetGroupResolver.FromRequest(cadetGroup, r.Body)
+	if err != nil {
+		c.render.JSON(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	res := c.CadetGroupValidator.Validate(cadetGroup)
+	if res == false {
+		c.render.JSON(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	cadetGroup.UUID = uuid.NewV4().String()
+
+	c.CadetGroupManager.Save(cadetGroup)
+
+	c.render.JSON(w, http.StatusCreated, cadetGroup)
+}

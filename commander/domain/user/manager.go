@@ -1,43 +1,68 @@
 package user
 
-import "github.com/vjftw/orchestrate/commander/persisters"
+import (
+	"errors"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Manager interface {
 	Save(*User) error
-	GetInto(*User, interface{}, ...interface{}) error
+	GetInto(*User, interface{}, ...interface{})
 	Delete(*User) error
+	FindByUUID(string) (*User, error)
+	FindByEmailAddress(string) (*User, error)
 }
 
 type UserManager struct {
-	GORMPersister persisters.Persister `inject:"persister.gorm"`
+	gorm *gorm.DB
 }
 
-func NewManager() Manager {
-	return &UserManager{}
+func NewManager(gormDB *gorm.DB) Manager {
+	return &UserManager{
+		gorm: gormDB,
+	}
 }
 
 // Save - Saves the model across storages
-func (d UserManager) Save(u *User) error {
-	d.GORMPersister.Save(u)
+func (m UserManager) Save(u *User) error {
+	m.gorm.Save(u)
 	return nil
 }
 
 // GetInto - Searches the storages for a model identified by the query and places it into the given model reference.
 // Returns true if found, false otherwise
-func (d UserManager) GetInto(u *User, query interface{}, args ...interface{}) error {
-	// check cache
-
+func (m UserManager) GetInto(u *User, query interface{}, args ...interface{}) {
 	// check database
-	err := d.GORMPersister.GetInto(u, query, args...)
-	if err != nil {
-		return err
+	m.gorm.Where(query, args...).First(u)
+}
+
+func (m UserManager) FindByUUID(uuid string) (*User, error) {
+	user := User{}
+
+	m.GetInto(&user, "uuid = ?", uuid)
+
+	if len(user.GetUUID()) < 1 {
+		return nil, errors.New("Not found")
 	}
 
-	return nil
+	return &user, nil
+}
+
+func (m UserManager) FindByEmailAddress(emailAddress string) (*User, error) {
+	user := User{}
+
+	m.GetInto(&user, "email_address = ?", emailAddress)
+
+	if len(user.GetUUID()) < 1 {
+		return nil, errors.New("Not found")
+	}
+
+	return &user, nil
 }
 
 // Delete - Deletes a model from the storages
-func (d UserManager) Delete(u *User) error {
-	d.GORMPersister.Delete(u)
+func (m UserManager) Delete(u *User) error {
+	m.gorm.Delete(u)
 	return nil
 }

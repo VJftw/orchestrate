@@ -35,7 +35,7 @@ func (c Controller) authHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.UserManager.GetInto(user, "email_address = ?", user.EmailAddress)
+	user, err = c.UserManager.FindByEmailAddress(user.EmailAddress)
 	if err != nil {
 		c.render.JSON(w, http.StatusNotFound, nil)
 		return
@@ -44,12 +44,7 @@ func (c Controller) authHandler(w http.ResponseWriter, r *http.Request) {
 	if user.VerifyPassword() {
 		token := c.AuthProvider.NewFromUser(user)
 
-		// if err != nil {
-		// 	c.render.JSON(w, http.StatusBadRequest, nil)
-		// 	return
-		// }
-
-		c.render.JSON(w, http.StatusCreated, token.ToMap())
+		c.render.JSON(w, http.StatusCreated, token)
 		return
 	}
 

@@ -1,43 +1,66 @@
 package project
 
-import "github.com/vjftw/orchestrate/commander/persisters"
+import (
+	"errors"
+
+	"github.com/vjftw/orchestrate/commander/domain/user"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Manager interface {
+	NewForUser(*user.User) *Project
 	Save(*Project) error
-	GetInto(*Project, interface{}, ...interface{}) error
 	Delete(*Project) error
+	GetInto(*Project, interface{}, ...interface{})
+	FindByUserAndUUID(*user.User, string) (*Project, error)
 }
 
 type ProjectManager struct {
-	GORMPersister persisters.Persister `inject:"persister.gorm"`
+	gorm *gorm.DB
 }
 
-func NewManager() Manager {
-	return &ProjectManager{}
+func NewManager(gormDB *gorm.DB) Manager {
+	return &ProjectManager{
+		gorm: gormDB,
+	}
+}
+
+func (m ProjectManager) NewForUser(u *user.User) *Project {
+	return &Project{
+		UserID: u.ID,
+	}
 }
 
 // Save - Saves the model across storages
-func (d ProjectManager) Save(u *Project) error {
-	d.GORMPersister.Save(u)
+func (m ProjectManager) Save(u *Project) error {
+	m.gorm.Save(u)
 	return nil
 }
 
 // GetInto - Searches the storages for a model identified by the query and places it into the given model reference.
 // Returns true if found, false otherwise
-func (d ProjectManager) GetInto(u *Project, query interface{}, args ...interface{}) error {
-	// check cache
-
+func (m ProjectManager) GetInto(p *Project, query interface{}, args ...interface{}) {
 	// check database
-	err := d.GORMPersister.GetInto(u, query, args...)
-	if err != nil {
-		return err
-	}
+	m.gorm.Where(query, args...).First(p)
+}
 
-	return nil
+func (m ProjectManager) FindByUserAndUUID(u *user.User, UUID string) (*Project, error) {
+	project := &Project{}
+	m.gorm.
+		Table("projects").
+		Joins("inner join users on projects.user_id = users.id").
+		Where("projects.uuid = ? and users.uuid = ?", UUID, u.GetUUID()).
+		First(project)
+
+	if len(project.GetUUID()) < 1 {
+		return nil, errors.New("Not found")
+	}
+	return project, nil
 }
 
 // Delete - Deletes a model from the storages
-func (d ProjectManager) Delete(u *Project) error {
-	d.GORMPersister.Delete(u)
+func (m ProjectManager) Delete(u *Project) error {
+	m.gorm.Delete(u)
 	return nil
 }

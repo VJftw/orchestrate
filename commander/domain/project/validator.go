@@ -11,6 +11,6 @@ func NewValidator() Validator {
 	return &ProjectValidator{}
 }
 
-func (v ProjectValidator) Validate(u *Project) bool {
+func (v ProjectValidator) Validate(p *Project) bool {
 	return true
 }
