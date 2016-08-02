@@ -1,5 +1,7 @@
 package user
 
+import "github.com/asaskevich/govalidator"
+
 type Validator interface {
 	Validate(*User) bool
 }
@@ -12,5 +14,7 @@ func NewValidator() Validator {
 }
 
 func (v UserValidator) Validate(u *User) bool {
-	return true
+	res, _ := govalidator.ValidateStruct(u)
+
+	return res
 }
