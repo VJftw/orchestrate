@@ -9,7 +9,7 @@ type CadetGroup struct {
 	ProjectID     uint      `json:"-"`
 	UUID          string    `json:"uuid" gorm:"unique"`
 	Name          string    `json:"name" gorm:"not null" valid:"alpha, required"`
-	Key           string    `json:"-" gorm:"not null"`
+	Key           string    `json:"key" gorm:"not null"`
 	Configuration string    `json:"configuration" valid:"alpha"`
 }
 

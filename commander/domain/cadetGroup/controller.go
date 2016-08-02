@@ -1,6 +1,9 @@
 package cadetGroup
 
 import (
+	"crypto/rand"
+	"crypto/sha512"
+	"encoding/hex"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,6 +31,11 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 		middlewares.NewJWT(renderer),
 		negroni.Wrap(http.HandlerFunc(c.securedPostHandler)),
 	)).Methods("POST")
+
+	router.Handle("/v1/projects/{projectUUID}/cadetGroups", negroni.New(
+		middlewares.NewJWT(renderer),
+		negroni.Wrap(http.HandlerFunc(c.securedGetHandler)),
+	)).Methods("GET")
 }
 
 func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,8 +66,31 @@ func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cadetGroup.UUID = uuid.NewV4().String()
+	secureRandom := make([]byte, 10)
+	rand.Read(secureRandom)
+	keyBytes := sha512.Sum512_256(secureRandom)
+	cadetGroup.Key = hex.EncodeToString(keyBytes[:sha512.Size256])
 
 	c.CadetGroupManager.Save(cadetGroup)
 
 	c.render.JSON(w, http.StatusCreated, cadetGroup)
+}
+
+func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	if err != nil {
+		c.render.JSON(w, http.StatusUnauthorized, nil)
+		return
+	}
+
+	projectUUID := mux.Vars(r)["projectUUID"]
+	project, err := c.ProjectManager.FindByUserAndUUID(user, projectUUID)
+	if err != nil {
+		c.render.JSON(w, http.StatusForbidden, nil)
+		return
+	}
+
+	cadetGroups := c.CadetGroupManager.FindByProject(project)
+
+	c.render.JSON(w, http.StatusOK, cadetGroups)
 }

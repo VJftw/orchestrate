@@ -28,6 +28,16 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 		middlewares.NewJWT(renderer),
 		negroni.Wrap(http.HandlerFunc(c.securedPostHandler)),
 	)).Methods("POST")
+
+	router.Handle("/v1/projects", negroni.New(
+		middlewares.NewJWT(renderer),
+		negroni.Wrap(http.HandlerFunc(c.securedGetHandler)),
+	)).Methods("GET")
+
+	router.Handle("/v1/projects/{projectUUID}", negroni.New(
+		middlewares.NewJWT(renderer),
+		negroni.Wrap(http.HandlerFunc(c.securedGetOneHandler)),
+	)).Methods("GET")
 }
 
 func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,4 +68,33 @@ func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
 	c.ProjectManager.Save(project)
 
 	c.render.JSON(w, http.StatusCreated, project)
+}
+
+func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	if err != nil {
+		c.render.JSON(w, http.StatusUnauthorized, nil)
+		return
+	}
+
+	projects := c.ProjectManager.FindByUser(user)
+
+	c.render.JSON(w, http.StatusOK, projects)
+}
+
+func (c Controller) securedGetOneHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	if err != nil {
+		c.render.JSON(w, http.StatusUnauthorized, nil)
+		return
+	}
+
+	projectUUID := mux.Vars(r)["projectUUID"]
+	project, err := c.ProjectManager.FindByUserAndUUID(user, projectUUID)
+
+	if err != nil {
+		c.render.JSON(w, http.StatusNotFound, nil)
+	}
+
+	c.render.JSON(w, http.StatusOK, project)
 }

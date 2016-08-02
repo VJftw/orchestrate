@@ -7,8 +7,8 @@ type Cadet struct {
 	ID           uint      `gorm:"primary_key" json:"-"`
 	CreatedAt    time.Time `json:"-"`
 	UpdatedAt    time.Time `json:"-"`
-	CadetGroupID int
-	UUID         string `json:"uuid" gorm:"unique"`
+	CadetGroupID int       `json:"-"`
+	UUID         string    `json:"uuid" gorm:"unique"`
 }
 
 // GetUUID - Returns the UUID

@@ -7,9 +7,9 @@ type Project struct {
 	ID        uint      `gorm:"primary_key" json:"-"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
-	UserID    uint
-	UUID      string `json:"uuid" gorm:"unique"`
-	Name      string `json:"name" gorm:"not null" valid:"alpha,required"`
+	UserID    uint      `json:"-"`
+	UUID      string    `json:"uuid" gorm:"unique"`
+	Name      string    `json:"name" gorm:"not null" valid:"alpha,required"`
 }
 
 // GetUUID - Returns the UUID
