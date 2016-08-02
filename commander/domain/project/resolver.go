@@ -2,6 +2,7 @@ package project
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 )
 
@@ -12,10 +13,6 @@ type Resolver interface {
 type ProjectResolver struct {
 }
 
-func NewResolver() Resolver {
-	return &ProjectResolver{}
-}
-
 func (r ProjectResolver) FromRequest(p *Project, b io.ReadCloser) error {
 	var rJSON map[string]interface{}
 
@@ -24,6 +21,9 @@ func (r ProjectResolver) FromRequest(p *Project, b io.ReadCloser) error {
 		return err
 	}
 
+	if _, ok := rJSON["name"]; !ok {
+		return errors.New("Missing name")
+	}
 	p.Name = rJSON["name"].(string)
 
 	return nil

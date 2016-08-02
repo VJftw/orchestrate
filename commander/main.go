@@ -49,7 +49,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&inject.Object{Name: "user.resolver", Value: &user.UserResolver{}},
 		&inject.Object{Name: "auth.provider", Value: auth.NewProvider()},
 		&inject.Object{Name: "project.manager", Value: project.NewManager(gormDB)},
-		&inject.Object{Name: "project.resolver", Value: project.NewResolver()},
+		&inject.Object{Name: "project.resolver", Value: &project.ProjectResolver{}},
 		&inject.Object{Name: "project.validator", Value: project.NewValidator()},
 		&inject.Object{Name: "cadetGroup.manager", Value: cadetGroup.NewManager(gormDB)},
 		&inject.Object{Name: "cadetGroup.resolver", Value: cadetGroup.NewResolver()},
