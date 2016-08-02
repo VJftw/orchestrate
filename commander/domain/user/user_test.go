@@ -1,6 +1,8 @@
-package user
+package user_test
 
 import (
+	"github.com/vjftw/orchestrate/commander/domain/user"
+
 	"testing"
 
 	"github.com/smartystreets/goconvey/convey"
@@ -8,7 +10,7 @@ import (
 
 func TestUser(t *testing.T) {
 	convey.Convey("Given a User Model", t, func() {
-		user := User{
+		user := user.User{
 			UUID:         "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
 			EmailAddress: "foo@bar.com",
 			Password:     "abc1234",

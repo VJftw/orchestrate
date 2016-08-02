@@ -3,6 +3,7 @@ package project
 import (
 	"net/http"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 	"github.com/unrolled/render"
@@ -11,13 +12,13 @@ import (
 	"github.com/vjftw/orchestrate/commander/middlewares"
 )
 
-// Project - Handles actions that can be performed on Projects
+// Controller - Handles actions that can be performed on Projects
 type Controller struct {
 	render           *render.Render
-	UserProvider     user.Provider `inject:"user.provider"`
-	ProjectManager   Manager       `inject:"project.manager"`
-	ProjectResolver  Resolver      `inject:"project.resolver"`
-	ProjectValidator Validator     `inject:"project.validator"`
+	UserManager      user.Manager `inject:"user.manager"`
+	ProjectManager   Manager      `inject:"project.manager"`
+	ProjectResolver  Resolver     `inject:"project.resolver"`
+	ProjectValidator Validator    `inject:"project.validator"`
 }
 
 // Setup - Sets up the controller on the router and a renderer
@@ -41,7 +42,9 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 }
 
 func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	authenticatedUserUUID := context.Get(r, "userUUID")
+
+	user, err := c.UserManager.FindByUUID(authenticatedUserUUID.(string))
 	if err != nil {
 		c.render.JSON(w, http.StatusUnauthorized, nil)
 		return
@@ -71,7 +74,9 @@ func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	authenticatedUserUUID := context.Get(r, "userUUID")
+
+	user, err := c.UserManager.FindByUUID(authenticatedUserUUID.(string))
 	if err != nil {
 		c.render.JSON(w, http.StatusUnauthorized, nil)
 		return
@@ -83,7 +88,9 @@ func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c Controller) securedGetOneHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	authenticatedUserUUID := context.Get(r, "userUUID")
+
+	user, err := c.UserManager.FindByUUID(authenticatedUserUUID.(string))
 	if err != nil {
 		c.render.JSON(w, http.StatusUnauthorized, nil)
 		return

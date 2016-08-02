@@ -7,14 +7,19 @@ type Validator interface {
 }
 
 type UserValidator struct {
-}
-
-func NewValidator() Validator {
-	return &UserValidator{}
+	UserManager Manager `inject:"user.manager"`
 }
 
 func (v UserValidator) Validate(u *User) bool {
 	res, _ := govalidator.ValidateStruct(u)
+	if !res {
+		return false
+	}
 
-	return res
+	_, err := v.UserManager.FindByEmailAddress(u.EmailAddress)
+	if err == nil {
+		return false
+	}
+
+	return true
 }

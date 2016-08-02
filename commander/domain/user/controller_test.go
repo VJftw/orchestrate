@@ -22,13 +22,11 @@ func TestController(t *testing.T) {
 
 	convey.Convey("Given a User Controller", t, func() {
 		userManager := &mocks.Manager{}
-		userProvider := &mocks.Provider{}
 		userResolver := &mocks.Resolver{}
 		userValidator := &mocks.Validator{}
 
 		userController := user.Controller{
 			UserManager:   userManager,
-			UserProvider:  userProvider,
 			UserResolver:  userResolver,
 			UserValidator: userValidator,
 		}
@@ -45,7 +43,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
+			userManager.On("New").Return(&user).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
 			userValidator.On("Validate", &user).Return(true).Once()
 			userManager.On("Save", &user).Return(nil).Once()
@@ -60,7 +58,6 @@ func TestController(t *testing.T) {
 				json.Unmarshal(writer.Body.Bytes(), &jsonResp)
 
 				convey.So(jsonResp["uuid"], convey.ShouldNotBeEmpty)
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -77,7 +74,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
+			userManager.On("New").Return(&user).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
 			userValidator.On("Validate", &user).Return(false).Once()
 
@@ -87,7 +84,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 400)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -101,7 +97,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
+			userManager.On("New").Return(&user).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(errors.New("Malformed request")).Once()
 
 			router.Handler.ServeHTTP(writer, request)
@@ -110,7 +106,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 400)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -135,8 +130,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
-			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userManager.On("FindByUUID", "abcdef1234").Return(&user, nil).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
 			user.Password = "barfoo4321"
 			userValidator.On("Validate", &user).Return(true).Once()
@@ -148,7 +142,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 200)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -172,7 +165,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 401)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -202,7 +194,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 403)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -226,17 +217,13 @@ func TestController(t *testing.T) {
 			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtTokenStr))
 			writer := httptest.NewRecorder()
 
-			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
-			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"missing"}).Return(errors.New("User not found.")).Once()
-
+			userManager.On("FindByUUID", "missing").Return(nil, errors.New("Not found"))
 			router.Handler.ServeHTTP(writer, request)
 
 			convey.Convey("Then it should give the correct 404 response", func() {
 				convey.So(writer.Code, convey.ShouldEqual, 404)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -256,8 +243,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
-			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userManager.On("FindByUUID", "abcdef1234").Return(&user, nil).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(errors.New("Malformed JSON")).Once()
 
 			router.Handler.ServeHTTP(writer, request)
@@ -266,7 +252,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 400)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)
@@ -290,8 +275,7 @@ func TestController(t *testing.T) {
 			writer := httptest.NewRecorder()
 
 			user := user.User{}
-			userProvider.On("New").Return(&user).Once()
-			userManager.On("GetInto", &user, "uuid = ?", []interface{}{"abcdef1234"}).Return(nil).Once()
+			userManager.On("FindByUUID", "abcdef1234").Return(&user, nil).Once()
 			userResolver.On("FromRequest", &user, request.Body).Return(nil).Once()
 			userValidator.On("Validate", &user).Return(false).Once()
 
@@ -301,7 +285,6 @@ func TestController(t *testing.T) {
 				convey.So(writer.Code, convey.ShouldEqual, 400)
 				convey.So(writer.Header().Get("Content-type"), convey.ShouldEqual, "application/json; charset=UTF-8")
 
-				convey.So(userProvider.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userResolver.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userValidator.AssertExpectations(t), convey.ShouldBeTrue)
 				convey.So(userManager.AssertExpectations(t), convey.ShouldBeTrue)

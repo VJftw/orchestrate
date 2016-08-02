@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"net/http"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/satori/go.uuid"
 	"github.com/unrolled/render"
@@ -17,7 +18,7 @@ import (
 
 type Controller struct {
 	render              *render.Render
-	UserProvider        user.Provider   `inject:"user.provider"`
+	UserManager         user.Manager    `inject:"user.manager"`
 	ProjectManager      project.Manager `inject:"project.manager"`
 	CadetGroupResolver  Resolver        `inject:"cadetGroup.resolver"`
 	CadetGroupValidator Validator       `inject:"cadetGroup.validator"`
@@ -39,7 +40,9 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 }
 
 func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	authenticatedUserUUID := context.Get(r, "userUUID")
+
+	user, err := c.UserManager.FindByUUID(authenticatedUserUUID.(string))
 	if err != nil {
 		c.render.JSON(w, http.StatusUnauthorized, nil)
 		return
@@ -77,7 +80,9 @@ func (c Controller) securedPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := c.UserProvider.FromAuthenticatedRequest(r)
+	authenticatedUserUUID := context.Get(r, "userUUID")
+
+	user, err := c.UserManager.FindByUUID(authenticatedUserUUID.(string))
 	if err != nil {
 		c.render.JSON(w, http.StatusUnauthorized, nil)
 		return

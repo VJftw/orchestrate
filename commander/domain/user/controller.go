@@ -15,7 +15,6 @@ type Controller struct {
 	render        *render.Render
 	UserManager   Manager   `inject:"user.manager"`
 	UserValidator Validator `inject:"user.validator"`
-	UserProvider  Provider  `inject:"user.provider"`
 	UserResolver  Resolver  `inject:"user.resolver"`
 }
 
@@ -34,7 +33,7 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 }
 
 func (c Controller) postHandler(w http.ResponseWriter, r *http.Request) {
-	user := c.UserProvider.New()
+	user := c.UserManager.New()
 
 	// Unmarshal request into user variable
 	err := c.UserResolver.FromRequest(user, r.Body)

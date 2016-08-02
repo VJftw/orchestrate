@@ -22,15 +22,68 @@ func (_m *Manager) Delete(_a0 *user.User) error {
 	return r0
 }
 
-// GetInto provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Manager) GetInto(_a0 *user.User, _a1 interface{}, _a2 ...interface{}) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// FindByEmailAddress provides a mock function with given fields: _a0
+func (_m *Manager) FindByEmailAddress(_a0 string) (*user.User, error) {
+	ret := _m.Called(_a0)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*user.User, interface{}, ...interface{}) error); ok {
-		r0 = rf(_a0, _a1, _a2...)
+	var r0 *user.User
+	if rf, ok := ret.Get(0).(func(string) *user.User); ok {
+		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FindByUUID provides a mock function with given fields: _a0
+func (_m *Manager) FindByUUID(_a0 string) (*user.User, error) {
+	ret := _m.Called(_a0)
+
+	var r0 *user.User
+	if rf, ok := ret.Get(0).(func(string) *user.User); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetInto provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Manager) GetInto(_a0 *user.User, _a1 interface{}, _a2 ...interface{}) {
+	_m.Called(_a0, _a1, _a2)
+}
+
+// New provides a mock function with given fields:
+func (_m *Manager) New() *user.User {
+	ret := _m.Called()
+
+	var r0 *user.User
+	if rf, ok := ret.Get(0).(func() *user.User); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
 	}
 
 	return r0

@@ -7,6 +7,7 @@ import (
 )
 
 type Manager interface {
+	New() *User
 	Save(*User) error
 	GetInto(*User, interface{}, ...interface{})
 	Delete(*User) error
@@ -22,6 +23,10 @@ func NewManager(gormDB *gorm.DB) Manager {
 	return &UserManager{
 		gorm: gormDB,
 	}
+}
+
+func (m UserManager) New() *User {
+	return &User{}
 }
 
 // Save - Saves the model across storages

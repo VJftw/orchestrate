@@ -45,9 +45,8 @@ func NewOrchestrateApp() *OrchestrateApp {
 
 	err := orchestrateApp.Graph.Provide(
 		&inject.Object{Name: "user.manager", Value: user.NewManager(gormDB)},
-		&inject.Object{Name: "user.validator", Value: user.NewValidator()},
-		&inject.Object{Name: "user.provider", Value: user.NewProvider()},
-		&inject.Object{Name: "user.resolver", Value: user.NewResolver()},
+		&inject.Object{Name: "user.validator", Value: &user.UserValidator{}},
+		&inject.Object{Name: "user.resolver", Value: &user.UserResolver{}},
 		&inject.Object{Name: "auth.provider", Value: auth.NewProvider()},
 		&inject.Object{Name: "project.manager", Value: project.NewManager(gormDB)},
 		&inject.Object{Name: "project.resolver", Value: project.NewResolver()},

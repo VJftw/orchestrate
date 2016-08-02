@@ -11,7 +11,6 @@ import (
 // Controller - Handles authentication
 type Controller struct {
 	render       *render.Render
-	UserProvider user.Provider `inject:"user.provider"`
 	UserResolver user.Resolver `inject:"user.resolver"`
 	UserManager  user.Manager  `inject:"user.manager"`
 	AuthProvider Provider      `inject:"auth.provider"`
@@ -26,7 +25,7 @@ func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 }
 
 func (c Controller) authHandler(w http.ResponseWriter, r *http.Request) {
-	user := c.UserProvider.New()
+	user := c.UserManager.New()
 
 	// Unmarshal request into user variable
 	err := c.UserResolver.FromRequest(user, r.Body)

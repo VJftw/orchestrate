@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 )
 
@@ -12,16 +13,20 @@ type Resolver interface {
 type UserResolver struct {
 }
 
-func NewResolver() Resolver {
-	return &UserResolver{}
-}
-
 func (r UserResolver) FromRequest(u *User, b io.ReadCloser) error {
 	var rJSON map[string]interface{}
 
 	err := json.NewDecoder(b).Decode(&rJSON)
 	if err != nil {
 		return err
+	}
+
+	if _, ok := rJSON["emailAddress"]; !ok {
+		return errors.New("Missing emailAddress")
+	}
+
+	if _, ok := rJSON["password"]; !ok {
+		return errors.New("Missing password")
 	}
 
 	u.EmailAddress = rJSON["emailAddress"].(string)
