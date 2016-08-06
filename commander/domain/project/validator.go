@@ -1,5 +1,7 @@
 package project
 
+import "github.com/asaskevich/govalidator"
+
 type Validator interface {
 	Validate(*Project) bool
 }
@@ -12,5 +14,7 @@ func NewValidator() Validator {
 }
 
 func (v ProjectValidator) Validate(p *Project) bool {
-	return true
+	res, _ := govalidator.ValidateStruct(p)
+
+	return res
 }

@@ -9,7 +9,7 @@ type Project struct {
 	UpdatedAt time.Time `json:"-"`
 	UserID    uint      `json:"-"`
 	UUID      string    `json:"uuid" gorm:"unique"`
-	Name      string    `json:"name" gorm:"not null" valid:"alpha,required"`
+	Name      string    `json:"name" gorm:"not null" valid:"length(3,255),required"`
 }
 
 // GetUUID - Returns the UUID
