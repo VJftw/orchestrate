@@ -16,6 +16,7 @@ import (
 	"github.com/vjftw/orchestrate/commander/middlewares"
 )
 
+// Controller - Handles actions that can be performed on CadetGroups
 type Controller struct {
 	render              *render.Render
 	UserManager         user.Manager    `inject:"user.manager"`
@@ -25,6 +26,7 @@ type Controller struct {
 	CadetGroupManager   Manager         `inject:"cadetGroup.manager"`
 }
 
+// Setup - Sets up the controller on the router and a renderer
 func (c Controller) Setup(router *mux.Router, renderer *render.Render) {
 	c.render = renderer
 
@@ -89,13 +91,8 @@ func (c Controller) securedGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	projectUUID := mux.Vars(r)["projectUUID"]
-	project, err := c.ProjectManager.FindByUserAndUUID(user, projectUUID)
-	if err != nil {
-		c.render.JSON(w, http.StatusForbidden, nil)
-		return
-	}
 
-	cadetGroups := c.CadetGroupManager.FindByProject(project)
+	cadetGroups := c.CadetGroupManager.FindByUserAndProjectUUID(user, projectUUID)
 
 	c.render.JSON(w, http.StatusOK, cadetGroups)
 }

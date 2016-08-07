@@ -77,7 +77,7 @@ func TestController(t *testing.T) {
 
 		convey.Convey("When I send an authenticated invalid POST request to /v1/projects", func() {
 			b, _ := json.Marshal(map[string]string{
-				"name": "IHav3Numb3r5",
+				"name": "a",
 			})
 
 			request, _ := http.NewRequest("POST", "/v1/projects", ioutil.NopCloser(bytes.NewReader(b)))

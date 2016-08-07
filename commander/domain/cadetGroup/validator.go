@@ -1,16 +1,22 @@
 package cadetGroup
 
+import "github.com/asaskevich/govalidator"
+
+// Validator - Validates CadetGroups
 type Validator interface {
 	Validate(*CadetGroup) bool
 }
 
-type CadetGroupValidator struct {
+type cadetGroupValidator struct {
 }
 
+// NewValidator - Returns a new Validator
 func NewValidator() Validator {
-	return &CadetGroupValidator{}
+	return &cadetGroupValidator{}
 }
 
-func (v CadetGroupValidator) Validate(c *CadetGroup) bool {
-	return true
+func (v cadetGroupValidator) Validate(c *CadetGroup) bool {
+	res, _ := govalidator.ValidateStruct(c)
+
+	return res
 }
