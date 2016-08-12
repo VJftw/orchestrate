@@ -8,6 +8,7 @@ import (
 
 	"github.com/facebookgo/inject"
 	"github.com/vjftw/orchestrate/commander/domain/auth"
+	"github.com/vjftw/orchestrate/commander/domain/cadet"
 	"github.com/vjftw/orchestrate/commander/domain/cadetGroup"
 	"github.com/vjftw/orchestrate/commander/domain/project"
 	"github.com/vjftw/orchestrate/commander/domain/user"
@@ -39,9 +40,15 @@ func NewOrchestrateApp() *OrchestrateApp {
 	var authController auth.Controller
 	var projectController project.Controller
 	var cadetGroupController cadetGroup.Controller
+	var cadetController cadet.Controller
 
 	// Initialise persisters to pass into managers
-	gormDB := persisters.NewGORMDB(&user.User{}, &project.Project{}, &cadetGroup.CadetGroup{})
+	gormDB := persisters.NewGORMDB(
+		&user.User{},
+		&project.Project{},
+		&cadetGroup.CadetGroup{},
+		&cadet.Cadet{},
+	)
 
 	err := orchestrateApp.Graph.Provide(
 		&inject.Object{Name: "user.manager", Value: user.NewManager(gormDB)},
@@ -54,6 +61,8 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&inject.Object{Name: "cadetGroup.manager", Value: cadetGroup.NewManager(gormDB)},
 		&inject.Object{Name: "cadetGroup.resolver", Value: cadetGroup.NewResolver()},
 		&inject.Object{Name: "cadetGroup.validator", Value: cadetGroup.NewValidator()},
+		&inject.Object{Name: "cadet.manager", Value: cadet.NewManager(gormDB)},
+		&inject.Object{Name: "cadet.resolver", Value: cadet.NewResolver()},
 
 		&inject.Object{
 			Name:  "user.controller",
@@ -70,6 +79,10 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&inject.Object{
 			Name:  "cadetGroup.controller",
 			Value: &cadetGroupController,
+		},
+		&inject.Object{
+			Name:  "cadet.controller",
+			Value: &cadetController,
 		},
 	)
 
@@ -91,6 +104,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 		&authController,
 		&projectController,
 		&cadetGroupController,
+		&cadetController,
 	}, true)
 
 	orchestrateApp.Router = muxRouter

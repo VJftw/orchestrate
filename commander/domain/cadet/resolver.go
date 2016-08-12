@@ -13,6 +13,10 @@ type Resolver interface {
 type CadetResolver struct {
 }
 
+func NewResolver() Resolver {
+	return &CadetResolver{}
+}
+
 func (r CadetResolver) KeyFromRequest(b io.ReadCloser) (string, error) {
 	var rJSON map[string]interface{}
 
