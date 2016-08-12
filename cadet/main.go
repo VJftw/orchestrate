@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fsouza/go-dockerclient"
 	"github.com/vjftw/orchestrate/cadet/configuration"
 )
 
@@ -39,6 +40,14 @@ func main() {
 	}
 
 	fmt.Println(config)
+
+	// Print Docker containers
+	endpoint := "unix:///var/run/docker.sock"
+	client, _ := docker.NewClient(endpoint)
+	containers, _ := client.ListContainers(docker.ListContainersOptions{})
+	for _, container := range containers {
+		fmt.Println(container.Command, container.Image, container.Names, container.Ports, container.Status)
+	}
 
 	// connect to websocket with cadet key
 }
