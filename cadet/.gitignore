@@ -1,0 +1,7 @@
+# Glide Golang depdendency management
+.glide
+vendor
+
+cadet
+features/integrationTest
+dist

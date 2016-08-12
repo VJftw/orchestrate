@@ -32,8 +32,12 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	decoder := json.NewDecoder(req.Body)
-	decoder.Decode(config)
+	err = json.NewDecoder(resp.Body).Decode(config)
+
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println(config)
 
 	// connect to websocket with cadet key
