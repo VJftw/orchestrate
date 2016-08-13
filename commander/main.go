@@ -22,19 +22,13 @@ type OrchestrateApp struct {
 	Router *routers.MuxRouter
 }
 
-type injectLogger struct {
-}
-
-func (l injectLogger) Debugf(format string, v ...interface{}) {
-	// fmt.Println(fmt.Sprintf(format, v))
-}
-
 // NewOrchestrateApp - Initialise with Depencency Injection
 func NewOrchestrateApp() *OrchestrateApp {
 	orchestrateApp := OrchestrateApp{}
-	orchestrateApp.Graph = &inject.Graph{
-		Logger: injectLogger{},
-	}
+	orchestrateApp.Graph = &inject.Graph{}
+	mainLogger := log.New(os.Stdout, "[main] ", log.Lshortfile)
+	wsLogger := log.New(os.Stdout, "[websocket] ", log.Lshortfile)
+	dbLogger := log.New(os.Stdout, "[database] ", log.Lshortfile)
 
 	var userController user.Controller
 	var authController auth.Controller
@@ -44,6 +38,7 @@ func NewOrchestrateApp() *OrchestrateApp {
 
 	// Initialise persisters to pass into managers
 	gormDB := persisters.NewGORMDB(
+		dbLogger,
 		&user.User{},
 		&project.Project{},
 		&cadetGroup.CadetGroup{},
@@ -51,6 +46,9 @@ func NewOrchestrateApp() *OrchestrateApp {
 	)
 
 	err := orchestrateApp.Graph.Provide(
+		&inject.Object{Name: "logger.main", Value: mainLogger},
+		&inject.Object{Name: "logger.ws", Value: wsLogger},
+		&inject.Object{Name: "logger.db", Value: dbLogger},
 		&inject.Object{Name: "user.manager", Value: user.NewManager(gormDB)},
 		&inject.Object{Name: "user.validator", Value: &user.UserValidator{}},
 		&inject.Object{Name: "user.resolver", Value: &user.UserResolver{}},

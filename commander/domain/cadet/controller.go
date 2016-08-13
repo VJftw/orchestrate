@@ -21,6 +21,7 @@ type Controller struct {
 	CadetResolver     Resolver           `inject:"cadet.resolver"`
 	CadetGroupManager cadetGroup.Manager `inject:"cadetGroup.manager"`
 	CadetManager      Manager            `inject:"cadet.manager"`
+	WSLog             *log.Logger        `inject:"logger.ws"`
 }
 
 // Setup - Sets up the controller on the router and a renderer
@@ -98,18 +99,18 @@ func (c Controller) monitorCadet(ws *websocket.Conn, cadet *Cadet) {
 		message := NewMessage()
 		err := ws.ReadJSON(message)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Closing WebSocket - WS error")
+			c.WSLog.Println(fmt.Sprintf("Closing Websocket: %s", err))
 			ws.Close()
 			return
 		}
 
-		fmt.Println(message)
+		c.WSLog.Println(fmt.Sprintf("Recieved: %v", message))
+
 		if cadet.Key != message.Key {
 			ws.WriteJSON(map[string]string{
 				"error": "Invalid Key",
 			})
-			fmt.Println("Closing WebSocket - Invalid key")
+			c.WSLog.Println("Closing Websocket: Invalid Key")
 			ws.Close()
 			return
 		}

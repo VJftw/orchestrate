@@ -2,6 +2,7 @@ package persisters
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -10,9 +11,9 @@ import (
 )
 
 // NewGORMDB - Initialises a connection to a GORM storage
-func NewGORMDB(models ...interface{}) *gorm.DB {
+func NewGORMDB(logger *log.Logger, models ...interface{}) *gorm.DB {
 
-	if !waitForService(fmt.Sprintf("%s:%s", os.Getenv("DB_HOST"), "5432")) {
+	if !waitForService(fmt.Sprintf("%s:%s", os.Getenv("DB_HOST"), "5432"), logger) {
 		panic("Could not find database")
 	}
 

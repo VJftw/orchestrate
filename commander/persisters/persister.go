@@ -1,6 +1,7 @@
 package persisters
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -18,15 +19,15 @@ type Persistable interface {
 	GetUUID() string
 }
 
-func waitForService(address string) bool {
+func waitForService(address string, logger *log.Logger) bool {
 
 	for i := 0; i < 12; i++ {
 		conn, err := net.Dial("tcp", address)
 		if err != nil {
-			log.Println("Connection error:", err)
+			logger.Println("Connection error:", err)
 		} else {
 			conn.Close()
-			log.Println("Got connection!")
+			logger.Println(fmt.Sprintf("Connected to %s", address))
 			return true
 		}
 		time.Sleep(5 * time.Second)
