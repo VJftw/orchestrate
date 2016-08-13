@@ -1,8 +1,12 @@
 package configuration
 
-import "os"
+import (
+	"fmt"
+	"log"
+	"os"
+)
 
-// Holds configuration for a Cadet
+// Configuration - Holds configuration for a Cadet
 type Configuration struct {
 	CommanderAddress string `json:"commanderAddress"`
 	CadetGroupKey    string `json:"cadetGroupKey"`
@@ -10,8 +14,12 @@ type Configuration struct {
 	CadetKey         string `json:"key"`
 }
 
+// AutoConfiguration - Automatically finds configuration based on environment
 func AutoConfiguration() *Configuration {
-	switch os.Getenv("CADET_HOST") {
+	host := os.Getenv("CADET_HOST")
+	log.Println(fmt.Sprintf("[configuration] Running on: %s", host))
+
+	switch host {
 	case "AWS":
 		return NewAWS()
 	case "GCP":

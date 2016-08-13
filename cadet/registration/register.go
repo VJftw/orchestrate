@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/vjftw/orchestrate/cadet/configuration"
 )
 
+// Register - Registers with the Commander
 func Register(c *configuration.Configuration) {
 	// register cadet with commander
 	url := fmt.Sprintf("http://%s/v1/cadets", c.CommanderAddress)
@@ -33,4 +35,5 @@ func Register(c *configuration.Configuration) {
 	if err != nil {
 		panic(err)
 	}
+	log.Println(fmt.Sprintf("[registration] Registered on Commander as %s", c.CadetUUID))
 }
