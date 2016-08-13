@@ -1,44 +1,22 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/gorilla/websocket"
 	"github.com/vjftw/orchestrate/cadet/configuration"
+	"github.com/vjftw/orchestrate/cadet/connection"
+	"github.com/vjftw/orchestrate/cadet/node"
+	"github.com/vjftw/orchestrate/cadet/registration"
 )
 
 func main() {
 	// Read vars
 	config := configuration.AutoConfiguration()
 
-	// register cadet with commander
-	url := fmt.Sprintf("http://%s/v1/cadets", config.CommanderAddress)
-	type registerMessage struct {
-		CadetGroupKey string `json:"cadetGroupKey"`
-	}
-	message := &registerMessage{
-		CadetGroupKey: config.CadetGroupKey,
-	}
-	jsonBody, _ := json.Marshal(message)
-
-	req, err := http.NewRequest("POST", url, bytes.NewReader(jsonBody))
-
-	httpClient := &http.Client{}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(config)
-
-	if err != nil {
-		panic(err)
-	}
+	// Register Cadet using vars
+	registration.Register(config)
 
 	fmt.Println(config)
 
@@ -57,8 +35,25 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	n := node.NewNode()
 	fmt.Println(resp)
-	wsConn.WriteJSON(map[string]string{
-		"hello": "world",
-	})
+
+	wsConn.WriteJSON(connection.NewMessage(config.CadetKey, n))
+
+	monitorConn(wsConn)
+}
+
+func monitorConn(ws *websocket.Conn) {
+	for {
+		wsJSON := node.NewNode()
+		err := ws.ReadJSON(wsJSON)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Closing WebSocket")
+			ws.Close()
+			return
+		}
+
+		fmt.Println(wsJSON)
+	}
 }

@@ -90,24 +90,32 @@ func (c Controller) wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go monitorCadet(ws, cadet)
+	go c.monitorCadet(ws, cadet)
 }
 
-func monitorCadet(ws *websocket.Conn, cadet *Cadet) {
+func (c Controller) monitorCadet(ws *websocket.Conn, cadet *Cadet) {
 	for {
-		messageType, p, err := ws.ReadMessage()
+		message := NewMessage()
+		err := ws.ReadJSON(message)
 		if err != nil {
 			fmt.Println(err)
-			fmt.Println("Closing WebSocket")
+			fmt.Println("Closing WebSocket - WS error")
 			ws.Close()
 			return
 		}
 
-		if messageType == websocket.BinaryMessage {
-			fmt.Println("BinaryMessage received")
-		} else if messageType == websocket.TextMessage {
-			fmt.Println("TextMessage received")
+		fmt.Println(message)
+		if cadet.Key != message.Key {
+			ws.WriteJSON(map[string]string{
+				"error": "Invalid Key",
+			})
+			fmt.Println("Closing WebSocket - Invalid key")
+			ws.Close()
+			return
 		}
-		fmt.Println(string(p))
+		// Add containers to message object
+
+		// send Message
+		ws.WriteJSON(NewMessage())
 	}
 }

@@ -1,5 +1,6 @@
 package: github.com/vjftw/orchestrate/cadet
 import:
-- package: github.com/fsouza/go-dockerclient
 - package: github.com/gorilla/websocket
   version: ^1.0.0
+- package: github.com/docker/engine-api
+  version: ^0.4.0

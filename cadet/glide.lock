@@ -1,5 +1,5 @@
-hash: 6526749b4b0027762c15c9d73128ce4ce8a903e399cf79e4673f73ec3797fe66
-updated: 2016-08-13T13:36:17.741684+01:00
+hash: 6c9dbe3581464bed92010e5a082c56a69ac0f42b4b618f6fa5993a6dcf808169
+updated: 2016-08-13T16:53:44.187279+01:00
 imports:
 - name: github.com/docker/docker
   version: 28c20592b62c9483e787f58ea6aca65420169512
@@ -18,8 +18,16 @@ imports:
 - name: github.com/docker/engine-api
   version: 3d1601b9d2436a70b0dfc045a23f6503d19195df
   subpackages:
+  - types/container
+  - types/network
+  - types/blkiodev
+  - types/strslice
   - types/filters
   - types/versions
+- name: github.com/docker/go-connections
+  version: 0bad1a3951398f88ef4dd75fdb42af374430be89
+  subpackages:
+  - nat
 - name: github.com/docker/go-units
   version: eb879ae3e2b84e2a142af415b679ddeda47ec71c
 - name: github.com/fsouza/go-dockerclient

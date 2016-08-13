@@ -1,5 +1,5 @@
-hash: 175de84c413c95099cdb7a5addffc272db1fa4f80358bba82d364a2f10c9c4d4
-updated: 2016-08-13T13:11:53.979959+01:00
+hash: 23b20c27eba930670dba32f9743514b56d4241523f37ebb8ccfba96715f96767
+updated: 2016-08-13T20:53:30.154779987+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -9,6 +9,19 @@ imports:
   - spew
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
+- name: github.com/docker/engine-api
+  version: 3d1601b9d2436a70b0dfc045a23f6503d19195df
+  subpackages:
+  - types/container
+  - types/network
+  - types/blkiodev
+  - types/strslice
+- name: github.com/docker/go-connections
+  version: 0bad1a3951398f88ef4dd75fdb42af374430be89
+  subpackages:
+  - nat
+- name: github.com/docker/go-units
+  version: eb879ae3e2b84e2a142af415b679ddeda47ec71c
 - name: github.com/facebookgo/inject
   version: 643b7206b487b04fbea325cf6e8d06a66f8db772
 - name: github.com/facebookgo/structtag
@@ -49,6 +62,10 @@ imports:
   version: 198ad4d8b8a4612176b804ca10555b222a086b40
 - name: github.com/urfave/negroni
   version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
+- name: github.com/vjftw/orchestrate
+  version: 6c04a3b29f23d229e13802bf886c08eb7a1579a7
+  subpackages:
+  - cadet/node
 - name: golang.org/x/crypto
   version: 10c26747e67d76ad4fafe6087c6f4073c3b22942
   subpackages:
