@@ -1,5 +1,5 @@
-hash: 1c4aefdc2e2d56012477985d28763bc2c8d93b4b497b20ba481ee161513225ea
-updated: 2016-07-29T16:54:33.693379365+01:00
+hash: 175de84c413c95099cdb7a5addffc272db1fa4f80358bba82d364a2f10c9c4d4
+updated: 2016-08-13T13:11:53.979959+01:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -17,6 +17,8 @@ imports:
   version: 1ea25387ff6f684839d82767c1733ff4d4d15d0a
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
+- name: github.com/gorilla/websocket
+  version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
 - name: github.com/jinzhu/gorm
   version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
   subpackages:
@@ -57,22 +59,9 @@ testImports:
   version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
   subpackages:
   - gomock
-- name: github.com/gopherjs/gopherjs
-  version: 090403452ab6979e3b7c054ceb7ee23da91b2ae4
-  subpackages:
-  - js
-- name: github.com/jtolds/gls
-  version: 8ddce2a84170772b95dd5d576c48d517b22cac63
-- name: github.com/smartystreets/assertions
-  version: 2063fd1cc7c975db70502811a34b06ad034ccdf2
-  subpackages:
-  - internal/go-render/render
-  - internal/oglematchers
 - name: github.com/smartystreets/goconvey
   version: d4c757aa9afd1e2fc1832aaab209b5794eb336e1
   subpackages:
   - convey
-  - convey/reporting
-  - convey/gotest
 - name: github.com/stretchr/testify
   version: f390dcf405f7b83c997eac1b06768bb9f44dec18

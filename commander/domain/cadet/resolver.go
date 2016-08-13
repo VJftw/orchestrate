@@ -6,18 +6,20 @@ import (
 	"io"
 )
 
+// Resolver - interface defining methods for a Cadet Resolver
 type Resolver interface {
 	KeyFromRequest(io.ReadCloser) (string, error)
 }
 
-type CadetResolver struct {
+type cadetResolver struct {
 }
 
+// NewResolver - Returns a new Cadet Resolver
 func NewResolver() Resolver {
-	return &CadetResolver{}
+	return &cadetResolver{}
 }
 
-func (r CadetResolver) KeyFromRequest(b io.ReadCloser) (string, error) {
+func (r cadetResolver) KeyFromRequest(b io.ReadCloser) (string, error) {
 	var rJSON map[string]interface{}
 
 	err := json.NewDecoder(b).Decode(&rJSON)
