@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	"golang.org/x/net/context"
+
+	"github.com/docker/engine-api/client"
+	"github.com/docker/engine-api/types"
 	"github.com/gorilla/websocket"
 	"github.com/vjftw/orchestrate/cadet/configuration"
 	"github.com/vjftw/orchestrate/cadet/connection"
@@ -19,12 +23,21 @@ func main() {
 	registration.Register(config)
 
 	// Print Docker containers
-	// endpoint := "unix:///var/run/docker.sock"
-	// client, _ := docker.NewClient(endpoint)
-	// containers, _ := client.ListContainers(docker.ListContainersOptions{})
-	// for _, container := range containers {
-	// 	fmt.Println(container.Command, container.Image, container.Names, container.Ports, container.Status)
-	// }
+	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
+	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
+	if err != nil {
+		panic(err)
+	}
+
+	options := types.ContainerListOptions{All: true}
+	containers, err := cli.ContainerList(context.Background(), options)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range containers {
+		fmt.Println(c.Names)
+	}
 
 	// connect to websocket with cadet key
 	dialer := websocket.Dialer{}
