@@ -1,8 +1,8 @@
-hash: f976791be51b1fb5b6d2393931f1c0fd22eaccbe007424b003362819695c88ae
-updated: 2016-08-12T23:42:46.666208+01:00
+hash: 6526749b4b0027762c15c9d73128ce4ce8a903e399cf79e4673f73ec3797fe66
+updated: 2016-08-13T13:36:17.741684+01:00
 imports:
 - name: github.com/docker/docker
-  version: 05d1dcfca25d534294cb42ffcdd7bedaeaa06ee7
+  version: 28c20592b62c9483e787f58ea6aca65420169512
   subpackages:
   - opts
   - pkg/archive
@@ -24,6 +24,8 @@ imports:
   version: eb879ae3e2b84e2a142af415b679ddeda47ec71c
 - name: github.com/fsouza/go-dockerclient
   version: 4a2e5288244cd60febbfc7bdd07891eab9efa6c1
+- name: github.com/gorilla/websocket
+  version: 1f512fc3f05332ba7117626cdfb4e07474e58e60
 - name: github.com/hashicorp/go-cleanhttp
   version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/opencontainers/runc

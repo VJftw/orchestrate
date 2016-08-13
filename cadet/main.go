@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fsouza/go-dockerclient"
+	"github.com/gorilla/websocket"
 	"github.com/vjftw/orchestrate/cadet/configuration"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	config := configuration.AutoConfiguration()
 
 	// register cadet with commander
-	url := fmt.Sprintf("%s/v1/cadets", config.CommanderAddress)
+	url := fmt.Sprintf("http://%s/v1/cadets", config.CommanderAddress)
 	type registerMessage struct {
 		CadetGroupKey string `json:"cadetGroupKey"`
 	}
@@ -50,4 +51,14 @@ func main() {
 	}
 
 	// connect to websocket with cadet key
+	dialer := websocket.Dialer{}
+	wsurl := fmt.Sprintf("ws://%s/v1/cadets/%s/ws", config.CommanderAddress, config.CadetUUID)
+	wsConn, resp, err := dialer.Dial(wsurl, nil)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(resp)
+	wsConn.WriteJSON(map[string]string{
+		"hello": "world",
+	})
 }
